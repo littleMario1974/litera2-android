@@ -22,21 +22,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        database = mutableListOf()
-
-        try {
-            val inputStream = resources.openRawResource(R.raw.words)
-            val reader = BufferedReader(InputStreamReader(inputStream))
-            var line: String?
-            while (reader.readLine().also { line = it } != null) {
-                val words = line!!.split("\\s+".toRegex())
-                for (word in words) {
-                    database.add(word)
-                }
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
+        database = loadDatabaseFromCache() ?: loadDatabaseFromFile()
 
         inputField = findViewById(R.id.inputField)
         wordList = findViewById(R.id.wordList)
@@ -59,6 +45,35 @@ class MainActivity : AppCompatActivity() {
             inputField.text.clear()
             adapter.clear()
         }
+    }
+
+    private fun loadDatabaseFromCache(): MutableList<String>? {
+        // Tu wczytaj bazę słów z pamięci podręcznej, jeśli istnieje
+        return null
+    }
+
+    private fun loadDatabaseFromFile(): MutableList<String> {
+        val database = mutableListOf<String>()
+        try {
+            val inputStream = resources.openRawResource(R.raw.words)
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            var line: String?
+            while (reader.readLine().also { line = it } != null) {
+                val words = line!!.split("\\s+".toRegex())
+                for (word in words) {
+                    database.add(word)
+                }
+            }
+            // Zapisz bazę słów do pamięci podręcznej
+            saveDatabaseToCache(database)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return database
+    }
+
+    private fun saveDatabaseToCache(database: MutableList<String>) {
+        // Tu zapisz bazę słów do pamięci podręcznej
     }
 
     private fun searchWords(inputLetters: String) {
