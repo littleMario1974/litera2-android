@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -7,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.literakowanie"
-    compileSdkVersion(34)
+    compileSdkVersion 34
     defaultConfig {
         applicationId = "com.example.literakowanie"
         minSdk = 24
@@ -15,7 +13,6 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -28,7 +25,7 @@ android {
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            minifyEnabled = false // Zmieniono isMinifyEnabled na minifyEnabled
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -41,6 +38,7 @@ android {
         kotlinCompilerExtensionVersion = "1.5.14" // Upewnij się, że jest to najnowsza wersja
     }
 }
+
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
