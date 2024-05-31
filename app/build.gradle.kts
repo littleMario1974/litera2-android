@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,8 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.literakowanie"
-    compileSdk = 34
-
+    compileSdkVersion(34)
     defaultConfig {
         applicationId = "com.example.literakowanie"
         minSdk = 24
@@ -18,6 +19,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        encoding = "UTF-8"
     }
 
     kotlinOptions {
@@ -25,25 +27,37 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14" // Upewnij się, że jest to najnowsza wersja
+    }
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.compose.foundation:foundation:1.6.7")
     implementation("androidx.compose.ui:ui-graphics:1.6.7")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.7")
     implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.activity:activity-compose:1.9.0") // Dodano dependency activity-compose
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.7") // Dodano dependency ui-test-junit4
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.7") // Dodano dependency ui-tooling
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.7") // Dodano dependency ui-test-manifest
 }
-
