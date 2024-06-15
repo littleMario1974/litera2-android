@@ -1,5 +1,6 @@
 package com.example.literakowanie
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -7,16 +8,22 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.Locale
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
     private lateinit var database: MutableList<String>
     private lateinit var inputField: EditText
     private lateinit var wordList: ListView
     private lateinit var adapter: ArrayAdapter<String>
+    private lateinit var infoLabel: TextView
+
+    private val executorService = Executors.newFixedThreadPool(4)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +33,7 @@ class MainActivity : AppCompatActivity() {
 
         inputField = findViewById(R.id.inputField)
         wordList = findViewById(R.id.wordList)
+        infoLabel = findViewById(R.id.infoLabel)
         val clearButton: Button = findViewById(R.id.clearButton)
 
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
@@ -44,12 +52,15 @@ class MainActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             inputField.text.clear()
             adapter.clear()
+            infoLabel.text = ""
+            infoLabel.setTextColor(getColor(android.R.color.holo_green_dark))
         }
     }
 
     private fun loadDatabaseFromCache(): MutableList<String>? {
-        // Tu wczytaj bazę słów z pamięci podręcznej, jeśli istnieje
-        return null
+        val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
+        val serializedDatabase = sharedPreferences.getString("database", null) ?: return null
+        return serializedDatabase.split(",").toMutableList()
     }
 
     private fun loadDatabaseFromFile(): MutableList<String> {
@@ -64,7 +75,6 @@ class MainActivity : AppCompatActivity() {
                     database.add(word)
                 }
             }
-            // Zapisz bazę słów do pamięci podręcznej
             saveDatabaseToCache(database)
         } catch (e: IOException) {
             e.printStackTrace()
@@ -73,22 +83,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveDatabaseToCache(database: MutableList<String>) {
-        // Tu zapisz bazę słów do pamięci podręcznej
+        val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val serializedDatabase = database.joinToString(",")
+        editor.putString("database", serializedDatabase)
+        editor.apply()
     }
 
     private fun searchWords(inputLetters: String) {
         val letterCount = inputLetters.length
-        val foundWords = findWords(database, inputLetters, letterCount)
 
-        adapter.clear()
-        adapter.addAll(foundWords)
+        runOnUiThread {
+            infoLabel.text = "Szukam..."
+            infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
+        }
+
+        executorService.submit {
+            val foundWords = findWords(database, inputLetters, letterCount)
+            runOnUiThread {
+                adapter.clear()
+                adapter.addAll(foundWords)
+                if (foundWords.isEmpty()) {
+                    infoLabel.text = "Nie znaleziono żadnego słowa."
+                    infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
+                } else {
+                    infoLabel.text = "Oto pasujące słowa:"
+                    infoLabel.setTextColor(getColor(android.R.color.holo_green_dark))
+                }
+            }
+        }
     }
 
     private fun findWords(database: List<String>, inputLetters: String, letterCount: Int): List<String> {
         val foundWords = mutableListOf<String>()
         val letters = mutableMapOf<Char, Int>()
 
-        for (letter in inputLetters) {
+        for (letter in inputLetters.toLowerCase(Locale.getDefault())) {
             letters[letter] = letters.getOrDefault(letter, 0) + 1
         }
 
@@ -107,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val wordLetters = mutableMapOf<Char, Int>()
-        for (letter in word) {
+        word.toLowerCase(Locale.getDefault()).forEach { letter ->
             wordLetters[letter] = wordLetters.getOrDefault(letter, 0) + 1
         }
 
@@ -118,5 +148,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         return true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        executorService.shutdown()
     }
 }
