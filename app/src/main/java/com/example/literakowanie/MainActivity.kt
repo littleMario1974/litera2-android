@@ -30,7 +30,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        database = loadDatabaseFromCache() ?: loadDatabaseFromFile()
+        // Load database from file
+        database = loadDatabaseFromFile()
 
         inputField = findViewById(R.id.inputField)
         wordList = findViewById(R.id.wordList)
@@ -58,12 +59,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadDatabaseFromCache(): MutableList<String>? {
-        val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
-        val serializedDatabase = sharedPreferences.getString("database", null) ?: return null
-        return serializedDatabase.split(",").toMutableList()
-    }
-
     private fun loadDatabaseFromFile(): MutableList<String> {
         val database = mutableListOf<String>()
         try {
@@ -76,19 +71,10 @@ class MainActivity : AppCompatActivity() {
                     database.add(word)
                 }
             }
-            saveDatabaseToCache(database)
         } catch (e: IOException) {
             e.printStackTrace()
         }
         return database
-    }
-
-    private fun saveDatabaseToCache(database: MutableList<String>) {
-        val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        val serializedDatabase = database.joinToString(",")
-        editor.putString("database", serializedDatabase)
-        editor.apply()
     }
 
     private fun searchWords(inputLetters: String) {
@@ -156,4 +142,5 @@ class MainActivity : AppCompatActivity() {
         executorService.shutdown()
     }
 }
+
 
