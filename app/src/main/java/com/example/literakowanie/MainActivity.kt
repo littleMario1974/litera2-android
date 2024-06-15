@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var infoLabel: TextView
 
     private val executorService = Executors.newFixedThreadPool(4)
+    private val POLISH_LETTERS = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,7 +92,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun searchWords(inputLetters: String) {
-        val letterCount = inputLetters.length
+        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
+        val letterCount = cleanedInputLetters.length
 
         runOnUiThread {
             infoLabel.text = "Szukam..."
@@ -99,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         executorService.submit {
-            val foundWords = findWords(database, inputLetters, letterCount)
+            val foundWords = findWords(database, cleanedInputLetters, letterCount).sorted()
             runOnUiThread {
                 adapter.clear()
                 adapter.addAll(foundWords)
@@ -116,35 +118,34 @@ class MainActivity : AppCompatActivity() {
 
     private fun findWords(database: List<String>, inputLetters: String, letterCount: Int): List<String> {
         val foundWords = mutableListOf<String>()
-        val letters = mutableMapOf<Char, Int>()
 
-        for (letter in inputLetters.toLowerCase(Locale.getDefault())) {
-            letters[letter] = letters.getOrDefault(letter, 0) + 1
-        }
-
-        for (word in database) {
-            if (canFormWord(word, letters.toMutableMap(), letterCount)) {
-                foundWords.add(word)
+        if (inputLetters.contains(" ")) {
+            for (c in POLISH_LETTERS) {
+                val inputWithReplacement = inputLetters.replaceFirst(" ", c.toString())
+                foundWords.addAll(database.filter { canFormWord(it, inputWithReplacement, letterCount) })
             }
+        } else {
+            foundWords.addAll(database.filter { canFormWord(it, inputLetters, letterCount) })
         }
 
         return foundWords
     }
 
-    private fun canFormWord(word: String, letters: MutableMap<Char, Int>, letterCount: Int): Boolean {
+    private fun canFormWord(word: String, inputLetters: String, letterCount: Int): Boolean {
         if (word.length != letterCount) {
             return false
         }
 
-        val wordLetters = mutableMapOf<Char, Int>()
-        word.toLowerCase(Locale.getDefault()).forEach { letter ->
-            wordLetters[letter] = wordLetters.getOrDefault(letter, 0) + 1
+        val letters = mutableMapOf<Char, Int>()
+        for (letter in inputLetters) {
+            letters[letter] = letters.getOrDefault(letter, 0) + 1
         }
 
-        for (letter in wordLetters.keys) {
-            if (!letters.containsKey(letter) || letters[letter]!! < wordLetters[letter]!!) {
+        for (letter in word) {
+            if (!letters.containsKey(letter) || letters[letter]!! < 1) {
                 return false
             }
+            letters[letter] = letters[letter]!! - 1
         }
 
         return true
@@ -155,3 +156,4 @@ class MainActivity : AppCompatActivity() {
         executorService.shutdown()
     }
 }
+
