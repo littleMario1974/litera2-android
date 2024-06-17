@@ -1,6 +1,5 @@
 package com.example.literakowanie
 
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,14 +9,13 @@ import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import java.io.BufferedReader
+import java.io.DataInputStream
 import java.io.IOException
-import java.io.InputStreamReader
 import java.util.Locale
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var database: MutableList<String>
+    private var cachedDatabase: MutableList<String>? = null
     private lateinit var inputField: EditText
     private lateinit var wordList: ListView
     private lateinit var adapter: ArrayAdapter<String>
@@ -26,26 +24,39 @@ class MainActivity : AppCompatActivity() {
     private val executorService = Executors.newFixedThreadPool(4)
     private val POLISH_LETTERS = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
 
+    private val handler = android.os.Handler()
+    private lateinit var searchRunnable: Runnable
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // Load database from file
-        database = loadDatabaseFromFile()
 
         inputField = findViewById(R.id.inputField)
         wordList = findViewById(R.id.wordList)
         infoLabel = findViewById(R.id.infoLabel)
         val clearButton: Button = findViewById(R.id.clearButton)
 
+        // Initialize database (load from cache or file)
+        cachedDatabase = cachedDatabase ?: loadDatabaseFromCache() ?: loadDatabaseFromFile()
+
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         wordList.adapter = adapter
+
+        // Initialize searchRunnable as an empty runnable
+        searchRunnable = Runnable { }
 
         inputField.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchWords(s.toString())
+                // Cancel previous search if it's pending
+                handler.removeCallbacks(searchRunnable)
+
+                // Schedule a new search after a delay
+                searchRunnable = Runnable {
+                    searchWords(s.toString())
+                }
+                handler.postDelayed(searchRunnable, 300) // Adjust delay as needed
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -62,19 +73,46 @@ class MainActivity : AppCompatActivity() {
     private fun loadDatabaseFromFile(): MutableList<String> {
         val database = mutableListOf<String>()
         try {
-            val inputStream = resources.openRawResource(R.raw.words)
-            val reader = BufferedReader(InputStreamReader(inputStream))
-            var line: String?
-            while (reader.readLine().also { line = it } != null) {
-                val words = line!!.split("\\s+".toRegex())
-                for (word in words) {
-                    database.add(word)
-                }
+            // Display loading message
+            runOnUiThread {
+                infoLabel.text = "Wczytuję bazę słów..."
+                infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
             }
+
+            // Load words from file
+            val inputStream = resources.openRawResource(R.raw.words)
+            val dataInputStream = DataInputStream(inputStream)
+
+            while (dataInputStream.available() > 0) {
+                val length = dataInputStream.readInt()  // read word length
+                val bytes = ByteArray(length)
+                dataInputStream.read(bytes)  // read bytes
+                val word = String(bytes, Charsets.UTF_8)  // convert to String
+                database.add(word)
+            }
+
+            // Close resources
+            dataInputStream.close()
+
+            // Clear loading message
+            runOnUiThread {
+                infoLabel.text = ""
+                infoLabel.setTextColor(getColor(android.R.color.holo_green_dark))
+            }
+
+            // Save to cache
+            cachedDatabase = database
+
         } catch (e: IOException) {
             e.printStackTrace()
+            // Handle error if needed
         }
         return database
+    }
+
+    private fun loadDatabaseFromCache(): MutableList<String>? {
+        // Return cached database if available
+        return cachedDatabase
     }
 
     private fun searchWords(inputLetters: String) {
@@ -87,7 +125,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         executorService.submit {
-            val foundWords = findWords(database, cleanedInputLetters, letterCount).sorted()
+            val foundWords = findWords(cachedDatabase ?: mutableListOf(), cleanedInputLetters, letterCount).sorted()
             runOnUiThread {
                 adapter.clear()
                 adapter.addAll(foundWords)
@@ -142,5 +180,3 @@ class MainActivity : AppCompatActivity() {
         executorService.shutdown()
     }
 }
-
-
