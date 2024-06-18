@@ -37,6 +37,10 @@ class MainActivity : AppCompatActivity() {
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         wordList.adapter = adapter
 
+        // Ukrycie infoLabel i progressBar na początku
+        infoLabel.visibility = View.INVISIBLE
+        progressBar.visibility = View.GONE
+
         loadDatabaseFromFile()
 
         inputField.addTextChangedListener(object : TextWatcher {
@@ -52,12 +56,9 @@ class MainActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             inputField.text.clear()
             adapter.clear()
-            infoLabel.text = ""
-            infoLabel.setTextColor(getColor(android.R.color.holo_green_dark))
-            // Dodajemy dodatkową linijkę, aby ukryć infoLabel po wciśnięciu "Wyczyść"
+            // Ukrycie infoLabel po wciśnięciu "Wyczyść"
             infoLabel.visibility = View.INVISIBLE
         }
-
 
         searchAllButton.setOnClickListener {
             val inputText = inputField.text.toString().trim()
@@ -119,14 +120,12 @@ class MainActivity : AppCompatActivity() {
                 inputField.visibility = View.VISIBLE // Pokaż pole do wpisywania liter po wczytaniu bazy
             }
         }
-
     }
 
     private fun searchWords(inputLetters: String) {
         if (inputLetters.isEmpty()) {
             // Jeśli inputLetters jest pusty, nie robimy wyszukiwania
             adapter.clear()
-            infoLabel.text = ""
             infoLabel.visibility = View.INVISIBLE
             return
         }
@@ -135,6 +134,7 @@ class MainActivity : AppCompatActivity() {
 
         runOnUiThread {
             infoLabel.text = "Szukam..."
+            infoLabel.visibility = View.VISIBLE
             infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
         }
 
@@ -159,6 +159,7 @@ class MainActivity : AppCompatActivity() {
 
         runOnUiThread {
             infoLabel.text = "Szukam wszystkich słów..."
+            infoLabel.visibility = View.VISIBLE
             infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
         }
 

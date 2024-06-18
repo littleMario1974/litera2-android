@@ -5,70 +5,75 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:max="100"
-        android:visibility="gone"/>
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/closeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
-        android:text="X" />
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/closeButton"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"/>
 
-    <EditText
-        android:id="@+id/inputField"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/closeButton"
-        android:layout_margin="16dp"
-        android:hint="Wpisz litery"
-        android:visibility="gone" />
+        <Button
+            android:id="@+id/closeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="16dp"
+            android:text="X" />
 
-    <Button
-        android:id="@+id/clearButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/inputField"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Wyczyść" />
+        <EditText
+            android:id="@+id/inputField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/closeButton"
+            android:layout_margin="16dp"
+            android:hint="Wpisz litery" />
 
-    <Button
-        android:id="@+id/searchAllButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/inputField"
-        android:layout_toEndOf="@id/clearButton"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Wyszukaj wszystkie" />
+        <Button
+            android:id="@+id/clearButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/inputField"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Wyczyść" />
 
-    <ListView
-        android:id="@+id/wordList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@id/clearButton"
-        android:layout_alignParentStart="true"
-        android:layout_margin="16dp"
-        android:layout_above="@id/infoLabel"
-        android:layout_weight="1"/>
+        <Button
+            android:id="@+id/searchAllButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/inputField"
+            android:layout_toEndOf="@id/clearButton"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Wyszukaj wszystkie" />
 
-    <TextView
-        android:id="@+id/infoLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
-        android:text=""
-        android:textAlignment="center"
-        android:textColor="@android:color/holo_green_dark" />
+        <ListView
+            android:id="@+id/wordList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@id/clearButton"
+            android:layout_alignParentStart="true"
+            android:layout_margin="16dp"
+            android:layout_above="@id/infoLabel"
+            android:layout_weight="1"/>
 
+        <TextView
+            android:id="@+id/infoLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="16dp"
+            android:text=""
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_green_dark" />
+
+    </RelativeLayout>
 </RelativeLayout>
