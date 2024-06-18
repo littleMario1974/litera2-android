@@ -54,7 +54,10 @@ class MainActivity : AppCompatActivity() {
             adapter.clear()
             infoLabel.text = ""
             infoLabel.setTextColor(getColor(android.R.color.holo_green_dark))
+            // Dodajemy dodatkową linijkę, aby ukryć infoLabel po wciśnięciu "Wyczyść"
+            infoLabel.visibility = View.INVISIBLE
         }
+
 
         searchAllButton.setOnClickListener {
             val inputText = inputField.text.toString().trim()
@@ -72,11 +75,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadDatabaseFromFile() {
         progressBar.visibility = View.VISIBLE
+        progressBar.progress = 0 // Ustawienie początkowego postępu
+
         executorService.submit {
             val database = mutableListOf<String>()
             try {
                 val inputStream = resources.openRawResource(R.raw.words)
                 val dataInputStream = DataInputStream(inputStream)
+
+                val fileSize = inputStream.available().toFloat()
+                var totalRead = 0f
+                var bytesRead = 0
 
                 while (dataInputStream.available() > 0) {
                     val length = dataInputStream.readInt()  // read word length
@@ -84,6 +93,18 @@ class MainActivity : AppCompatActivity() {
                     dataInputStream.read(bytes)  // read bytes
                     val word = String(bytes, Charsets.UTF_8)  // convert to String
                     database.add(word)
+
+                    totalRead += length
+                    bytesRead += length
+
+                    // Aktualizacja ProgressBar co 10% postępu
+                    if (bytesRead >= fileSize * 0.1 || dataInputStream.available() == 0) {
+                        val progress = ((totalRead / fileSize) * 100).toInt()
+                        runOnUiThread {
+                            progressBar.progress = progress
+                        }
+                        bytesRead = 0
+                    }
                 }
 
                 dataInputStream.close()
@@ -95,12 +116,21 @@ class MainActivity : AppCompatActivity() {
 
             runOnUiThread {
                 progressBar.visibility = View.GONE
+                inputField.visibility = View.VISIBLE // Pokaż pole do wpisywania liter po wczytaniu bazy
             }
         }
+
     }
 
     private fun searchWords(inputLetters: String) {
-        val cleanedInputLetters = inputLetters.lowercase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
+        if (inputLetters.isEmpty()) {
+            // Jeśli inputLetters jest pusty, nie robimy wyszukiwania
+            adapter.clear()
+            infoLabel.text = ""
+            infoLabel.visibility = View.INVISIBLE
+            return
+        }
+        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
         val letterCount = cleanedInputLetters.length
 
         runOnUiThread {
@@ -125,7 +155,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun searchAllWords(inputLetters: String) {
-        val cleanedInputLetters = inputLetters.lowercase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
+        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
 
         runOnUiThread {
             infoLabel.text = "Szukam wszystkich słów..."
@@ -198,4 +228,3 @@ class MainActivity : AppCompatActivity() {
         executorService.shutdown()
     }
 }
-

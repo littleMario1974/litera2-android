@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:max="100"
         android:visibility="gone"/>
 
     <Button
@@ -28,7 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/closeButton"
         android:layout_margin="16dp"
-        android:hint="Wpisz litery" />
+        android:hint="Wpisz litery"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/clearButton"
@@ -54,9 +56,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/clearButton"
-        android:layout_above="@id/infoLabel"
+        android:layout_alignParentStart="true"
         android:layout_margin="16dp"
-        android:layout_weight="1" />
+        android:layout_above="@id/infoLabel"
+        android:layout_weight="1"/>
 
     <TextView
         android:id="@+id/infoLabel"
