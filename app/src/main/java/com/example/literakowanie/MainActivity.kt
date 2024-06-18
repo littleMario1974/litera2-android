@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
             if (inputText.length >= 3) {
                 searchAllWords(inputText)
             } else {
-                Toast.makeText(this, "Wprowadź przynajmniej dtrzy litery do wyszukania wszystkich słów.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Wprowadź przynajmniej trzy litery do wyszukania wszystkich słów.", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun searchWords(inputLetters: String) {
-        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
+        val cleanedInputLetters = inputLetters.lowercase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
         val letterCount = cleanedInputLetters.length
 
         runOnUiThread {
@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun searchAllWords(inputLetters: String) {
-        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
+        val cleanedInputLetters = inputLetters.lowercase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
 
         runOnUiThread {
             infoLabel.text = "Szukam wszystkich słów..."
@@ -198,3 +198,4 @@ class MainActivity : AppCompatActivity() {
         executorService.shutdown()
     }
 }
+
