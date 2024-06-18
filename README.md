@@ -3,6 +3,7 @@ For example - we enter "lit".
 Finds:
 - lit
 - tli
+
 Press "Search all".
 Finds:
 - lit
