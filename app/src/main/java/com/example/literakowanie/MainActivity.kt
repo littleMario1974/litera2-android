@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import java.io.DataInputStream
@@ -18,6 +19,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var infoLabel: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var clearButton: Button
+    private lateinit var searchAllButton: Button
 
     private val executorService = Executors.newFixedThreadPool(4)
     private val POLISH_LETTERS = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
@@ -30,16 +33,19 @@ class MainActivity : AppCompatActivity() {
         wordList = findViewById(R.id.wordList)
         infoLabel = findViewById(R.id.infoLabel)
         progressBar = findViewById(R.id.progressBar)
-        val clearButton: Button = findViewById(R.id.clearButton)
-        val searchAllButton: Button = findViewById(R.id.searchAllButton)
+        clearButton = findViewById(R.id.clearButton)
+        searchAllButton = findViewById(R.id.searchAllButton)
         val closeButton: Button = findViewById(R.id.closeButton)
 
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         wordList.adapter = adapter
 
-        // Ukrycie infoLabel i progressBar na początku
+        // Ukrycie infoLabel, progressBar, przycisków "Wyczyść" i "Wyszukaj wszystkie" oraz inputField na początku
         infoLabel.visibility = View.INVISIBLE
         progressBar.visibility = View.GONE
+        clearButton.visibility = View.GONE
+        searchAllButton.visibility = View.GONE
+        inputField.visibility = View.GONE
 
         loadDatabaseFromFile()
 
@@ -47,7 +53,41 @@ class MainActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchWords(s.toString())
+                if (s != null) {
+                    val newText = s.toString()
+                    val numSpaces = newText.count { it == ' ' }
+
+                    // Sprawdzenie ilości spacji
+                    if (numSpaces > 1) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Dozwolona jedna spacja",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        // Usunięcie ostatniej spacji
+                        val sanitizedText = newText.substring(0, start) + newText.substring(start + count)
+                        inputField.setText(sanitizedText)
+                        inputField.setSelection(start) // Ustawienie kursora na właściwe miejsce
+                    } else {
+                        // Sprawdzenie niedozwolonych znaków
+                        val disallowedChar = newText.find { it !in POLISH_LETTERS && it != ' ' }
+                        if (disallowedChar != null) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Niedozwolony znak",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            // Usunięcie niedozwolonego znaku
+                            val sanitizedText = newText.substring(0, start) + newText.substring(start + count)
+                            inputField.setText(sanitizedText)
+                            inputField.setSelection(start) // Ustawienie kursora na właściwe miejsce
+                        } else {
+                            searchWords(newText)
+                        }
+                    }
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -65,7 +105,11 @@ class MainActivity : AppCompatActivity() {
             if (inputText.length >= 3) {
                 searchAllWords(inputText)
             } else {
-                Toast.makeText(this, "Wprowadź przynajmniej trzy litery do wyszukania wszystkich słów.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Wprowadź przynajmniej trzy litery do wyszukania wszystkich słów.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -118,6 +162,13 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 progressBar.visibility = View.GONE
                 inputField.visibility = View.VISIBLE // Pokaż pole do wpisywania liter po wczytaniu bazy
+                clearButton.visibility = View.VISIBLE // Pokaż przycisk "Wyczyść" po wczytaniu bazy
+                searchAllButton.visibility = View.VISIBLE // Pokaż przycisk "Wyszukaj wszystkie" po wczytaniu bazy
+
+                // Ustawienie fokusu na pole do wpisywania liter i pokazanie klawiatury wirtualnej
+                inputField.requestFocus()
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(inputField, InputMethodManager.SHOW_IMPLICIT)
             }
         }
     }
@@ -129,7 +180,8 @@ class MainActivity : AppCompatActivity() {
             infoLabel.visibility = View.INVISIBLE
             return
         }
-        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
+        val cleanedInputLetters =
+            inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
         val letterCount = cleanedInputLetters.length
 
         runOnUiThread {
@@ -155,7 +207,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun searchAllWords(inputLetters: String) {
-        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
+        val cleanedInputLetters =
+            inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
 
         runOnUiThread {
             infoLabel.text = "Szukam wszystkich słów..."
@@ -164,7 +217,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         executorService.submit {
-            val foundWords = findAllWords(database, cleanedInputLetters).sortedWith(compareByDescending<String> { it.length }.thenBy { it })
+            val foundWords =
+                findAllWords(database, cleanedInputLetters).sortedWith(compareByDescending<String> { it.length }.thenBy { it })
             runOnUiThread {
                 adapter.clear()
                 adapter.addAll(foundWords)
