@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         clearButton = findViewById(R.id.clearButton)
         searchAllButton = findViewById(R.id.searchAllButton)
-        val closeButton: Button = findViewById(R.id.closeButton)
+        val closeButton: ImageButton = findViewById(R.id.closeButton)
 
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         wordList.adapter = adapter
