@@ -1,11 +1,14 @@
-The application is used to search for words from letters entered by the user. It can be used in the popular game "Scrabble" or in the Polish version of this game available on the Internet under the title "Literaki". Publicly available resources were used as a word database. After entering the letters, the application searches for words from all letters or after pressing the "Search all" button, it searches for all possible words from the given letters.
-For example - we enter "lit".
-Finds:
+The application helps users search for words based on the letters they input. It can be particularly useful for popular games like "Scrabble" or its Polish counterpart available online, "Literaki." The word database is built using publicly available resources.
+
+Users can enter letters, and the application will find words that can be formed from those letters. Additionally, by pressing the "Search all" button, the application will search for all possible word combinations from the given letters.
+
+For example, if you enter "lit" it will find:
+
 - lit
 - tli
 
-Press "Search all".
-Finds:
+If you press "Search all" it will find:
+
 - lit
 - tli
 - il
