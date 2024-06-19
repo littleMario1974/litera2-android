@@ -56,40 +56,48 @@ class MainActivity : AppCompatActivity() {
                 if (s != null) {
                     val newText = s.toString()
 
-                    // Sprawdzenie ilości spacji
+                    // Wyczyszczenie adaptera przechowującego znalezione słowa
+                    adapter.clear()
+
+                    // Ukrycie infoLabel po zmianie tekstu
+                    infoLabel.visibility = View.INVISIBLE
+
+                    // Walidacja ilości spacji
                     val numSpaces = newText.count { it == ' ' }
                     if (numSpaces > 1) {
                         Toast.makeText(
                             this@MainActivity,
-                            "Dozwolona jedna spacja",
+                            "Dozwolona jedna spacja.",
                             Toast.LENGTH_SHORT
                         ).show()
 
                         // Usunięcie ostatniej spacji
-                        val sanitizedText = newText.substring(0, start) + newText.substring(start + count)
+                        val sanitizedText = newText.replace(" ", "", true)
                         inputField.setText(sanitizedText)
-                        inputField.setSelection(start) // Ustawienie kursora na właściwe miejsce
+                        inputField.setSelection(inputField.length()) // Ustawienie kursora na końcu
                         return
                     }
 
-                    // Sprawdzenie niedozwolonych znaków
+                    // Walidacja niedozwolonych znaków
                     val disallowedChar = newText.find { it !in POLISH_LETTERS && it != ' ' }
                     if (disallowedChar != null) {
                         Toast.makeText(
                             this@MainActivity,
-                            "Niedozwolony znak",
+                            "Niedozwolony znak.",
                             Toast.LENGTH_SHORT
                         ).show()
 
                         // Usunięcie niedozwolonego znaku
-                        val sanitizedText = newText.substring(0, start) + newText.substring(start + count)
+                        val sanitizedText = newText.replace(disallowedChar.toString(), "", true)
                         inputField.setText(sanitizedText)
-                        inputField.setSelection(start) // Ustawienie kursora na właściwe miejsce
+                        inputField.setSelection(inputField.length()) // Ustawienie kursora na końcu
                         return
                     }
 
-                    // Jeśli nie ma błędów, przekazujemy tekst do wyszukiwania słów
-                    searchWords(newText)
+                    // Jeśli nowy tekst jest niepusty, rozpocznij wyszukiwanie
+                    if (newText.isNotBlank()) {
+                        searchWords(newText)
+                    }
                 }
             }
 
