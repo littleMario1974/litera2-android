@@ -55,9 +55,9 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s != null) {
                     val newText = s.toString()
-                    val numSpaces = newText.count { it == ' ' }
 
                     // Sprawdzenie ilości spacji
+                    val numSpaces = newText.count { it == ' ' }
                     if (numSpaces > 1) {
                         Toast.makeText(
                             this@MainActivity,
@@ -69,29 +69,33 @@ class MainActivity : AppCompatActivity() {
                         val sanitizedText = newText.substring(0, start) + newText.substring(start + count)
                         inputField.setText(sanitizedText)
                         inputField.setSelection(start) // Ustawienie kursora na właściwe miejsce
-                    } else {
-                        // Sprawdzenie niedozwolonych znaków
-                        val disallowedChar = newText.find { it !in POLISH_LETTERS && it != ' ' }
-                        if (disallowedChar != null) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                "Niedozwolony znak",
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                            // Usunięcie niedozwolonego znaku
-                            val sanitizedText = newText.substring(0, start) + newText.substring(start + count)
-                            inputField.setText(sanitizedText)
-                            inputField.setSelection(start) // Ustawienie kursora na właściwe miejsce
-                        } else {
-                            searchWords(newText)
-                        }
+                        return
                     }
+
+                    // Sprawdzenie niedozwolonych znaków
+                    val disallowedChar = newText.find { it !in POLISH_LETTERS && it != ' ' }
+                    if (disallowedChar != null) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Niedozwolony znak",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        // Usunięcie niedozwolonego znaku
+                        val sanitizedText = newText.substring(0, start) + newText.substring(start + count)
+                        inputField.setText(sanitizedText)
+                        inputField.setSelection(start) // Ustawienie kursora na właściwe miejsce
+                        return
+                    }
+
+                    // Jeśli nie ma błędów, przekazujemy tekst do wyszukiwania słów
+                    searchWords(newText)
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
+
 
         clearButton.setOnClickListener {
             inputField.text.clear()
@@ -180,8 +184,7 @@ class MainActivity : AppCompatActivity() {
             infoLabel.visibility = View.INVISIBLE
             return
         }
-        val cleanedInputLetters =
-            inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
+        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault())
         val letterCount = cleanedInputLetters.length
 
         runOnUiThread {
@@ -207,8 +210,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun searchAllWords(inputLetters: String) {
-        val cleanedInputLetters =
-            inputLetters.toLowerCase(Locale.getDefault()).replace("[^aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż\\s]".toRegex(), "")
+        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault())
 
         runOnUiThread {
             infoLabel.text = "Szukam wszystkich słów..."
