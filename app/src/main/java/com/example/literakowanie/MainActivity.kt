@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity() {
                     infoLabel.text = "Nie znaleziono żadnego słowa."
                     infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
                 } else {
-                    infoLabel.text = "Oto pasujące słowa:"
+                    infoLabel.text = "Oto pasujące słowa"
                     infoLabel.setTextColor(getColor(android.R.color.holo_green_dark))
                 }
             }
@@ -236,7 +236,7 @@ class MainActivity : AppCompatActivity() {
                     infoLabel.text = "Nie znaleziono żadnego słowa."
                     infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
                 } else {
-                    infoLabel.text = "Oto wszystkie możliwe słowa:"
+                    infoLabel.text = "Oto wszystkie możliwe słowa."
                     infoLabel.setTextColor(getColor(android.R.color.holo_green_dark))
                 }
             }
