@@ -32,9 +32,10 @@
             android:id="@+id/inputField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/closeButton"
+            android:layout_below="@id/progressBar"
             android:layout_margin="16dp"
-            android:hint="Wpisz litery" />
+            android:hint="Wpisz litery"
+            android:inputType="textNoSuggestions" />
 
         <Button
             android:id="@+id/clearButton"

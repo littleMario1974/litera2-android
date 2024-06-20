@@ -2,6 +2,7 @@ package com.example.literakowanie
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -49,60 +50,65 @@ class MainActivity : AppCompatActivity() {
 
         loadDatabaseFromFile()
 
-        inputField.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        inputField.apply {
+            // Ustawienie flagi dla EditText, aby wyłączyć korektę słów
+            inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s != null) {
-                    val newText = s.toString()
+            addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-                    // Wyczyszczenie adaptera przechowującego znalezione słowa
-                    adapter.clear()
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    if (s != null) {
+                        val newText = s.toString()
 
-                    // Ukrycie infoLabel po zmianie tekstu
-                    infoLabel.visibility = View.INVISIBLE
+                        // Wyczyszczenie adaptera przechowującego znalezione słowa
+                        adapter.clear()
 
-                    // Walidacja ilości spacji
-                    val numSpaces = newText.count { it == ' ' }
-                    if (numSpaces > 1) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Dozwolona jedna spacja.",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        // Ukrycie infoLabel po zmianie tekstu
+                        infoLabel.visibility = View.INVISIBLE
 
-                        // Usunięcie ostatniej spacji
-                        val sanitizedText = newText.replace(" ", "", true)
-                        inputField.setText(sanitizedText)
-                        inputField.setSelection(inputField.length()) // Ustawienie kursora na końcu
-                        return
-                    }
+                        // Walidacja ilości spacji
+                        val numSpaces = newText.count { it == ' ' }
+                        if (numSpaces > 1) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Dozwolona jedna spacja.",
+                                Toast.LENGTH_SHORT
+                            ).show()
 
-                    // Walidacja niedozwolonych znaków
-                    val disallowedChar = newText.find { it !in POLISH_LETTERS && it != ' ' }
-                    if (disallowedChar != null) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Niedozwolony znak.",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                            // Usunięcie ostatniej spacji
+                            val sanitizedText = newText.replace(" ", "", true)
+                            setText(sanitizedText)
+                            setSelection(length()) // Ustawienie kursora na końcu
+                            return
+                        }
 
-                        // Usunięcie niedozwolonego znaku
-                        val sanitizedText = newText.replace(disallowedChar.toString(), "", true)
-                        inputField.setText(sanitizedText)
-                        inputField.setSelection(inputField.length()) // Ustawienie kursora na końcu
-                        return
-                    }
+                        // Walidacja niedozwolonych znaków
+                        val disallowedChar = newText.find { it !in POLISH_LETTERS && it != ' ' }
+                        if (disallowedChar != null) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Niedozwolony znak.",
+                                Toast.LENGTH_SHORT
+                            ).show()
 
-                    // Jeśli nowy tekst jest niepusty, rozpocznij wyszukiwanie
-                    if (newText.isNotBlank()) {
-                        searchWords(newText)
+                            // Usunięcie niedozwolonego znaku
+                            val sanitizedText = newText.replace(disallowedChar.toString(), "", true)
+                            setText(sanitizedText)
+                            setSelection(length()) // Ustawienie kursora na końcu
+                            return
+                        }
+
+                        // Jeśli nowy tekst jest niepusty, rozpocznij wyszukiwanie
+                        if (newText.isNotBlank()) {
+                            searchWords(newText)
+                        }
                     }
                 }
-            }
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
+                override fun afterTextChanged(s: Editable?) {}
+            })
+        }
 
 
         clearButton.setOnClickListener {
