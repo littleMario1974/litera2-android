@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var clearButton: Button
     private lateinit var searchAllButton: Button
+    private lateinit var searchFromAllButton: Button // Nowy przycisk
 
     private val executorService = Executors.newFixedThreadPool(4)
     private val POLISH_LETTERS = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
@@ -36,16 +37,18 @@ class MainActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         clearButton = findViewById(R.id.clearButton)
         searchAllButton = findViewById(R.id.searchAllButton)
+        searchFromAllButton = findViewById(R.id.searchFromAllButton) // Inicjalizacja nowego przycisku
         val closeButton: ImageButton = findViewById(R.id.closeButton)
 
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         wordList.adapter = adapter
 
-        // Ukrycie infoLabel, progressBar, przycisków "Wyczyść" i "Wyszukaj wszystkie" oraz inputField na początku
+        // Ukrycie infoLabel, progressBar, przycisków "Wyczyść", "Szukaj wszystkie" oraz inputField na początku
         infoLabel.visibility = View.INVISIBLE
         progressBar.visibility = View.GONE
         clearButton.visibility = View.GONE
         searchAllButton.visibility = View.GONE
+        searchFromAllButton.visibility = View.GONE
         inputField.visibility = View.GONE
 
         loadDatabaseFromFile()
@@ -76,8 +79,10 @@ class MainActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
 
-                            // Usunięcie ostatniej spacji
-                            val sanitizedText = newText.replace(" ", "", true)
+                            // Usunięcie nadmiarowych spacji, pozostawiając pierwszą
+                            val firstSpaceIndex = newText.indexOf(' ')
+                            val sanitizedText = newText.substring(0, firstSpaceIndex + 1) +
+                                    newText.substring(firstSpaceIndex + 1).replace(" ", "")
                             setText(sanitizedText)
                             setSelection(length()) // Ustawienie kursora na końcu
                             return
@@ -98,18 +103,12 @@ class MainActivity : AppCompatActivity() {
                             setSelection(length()) // Ustawienie kursora na końcu
                             return
                         }
-
-                        // Jeśli nowy tekst jest niepusty, rozpocznij wyszukiwanie
-                        if (newText.isNotBlank()) {
-                            searchWords(newText)
-                        }
                     }
                 }
 
                 override fun afterTextChanged(s: Editable?) {}
             })
         }
-
 
         clearButton.setOnClickListener {
             inputField.text.clear()
@@ -126,6 +125,19 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this,
                     "Wprowadź przynajmniej trzy litery do wyszukania wszystkich słów.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        searchFromAllButton.setOnClickListener {
+            val inputText = inputField.text.toString().trim()
+            if (inputText.length >= 3) {
+                searchWords(inputText)
+            } else {
+                Toast.makeText(
+                    this,
+                    "Wprowadź przynajmniej trzy litery do wyszukania z wszystkich słów.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -181,7 +193,8 @@ class MainActivity : AppCompatActivity() {
                 progressBar.visibility = View.GONE
                 inputField.visibility = View.VISIBLE // Pokaż pole do wpisywania liter po wczytaniu bazy
                 clearButton.visibility = View.VISIBLE // Pokaż przycisk "Wyczyść" po wczytaniu bazy
-                searchAllButton.visibility = View.VISIBLE // Pokaż przycisk "Wyszukaj wszystkie" po wczytaniu bazy
+                searchAllButton.visibility = View.VISIBLE // Pokaż przycisk "Szukaj wszystkie" po wczytaniu bazy
+                searchFromAllButton.visibility = View.VISIBLE // Pokaż przycisk "Szukaj z wszystkich" po wczytaniu bazy
 
                 // Ustawienie fokusu na pole do wpisywania liter i pokazanie klawiatury wirtualnej
                 inputField.requestFocus()
@@ -235,6 +248,8 @@ class MainActivity : AppCompatActivity() {
         executorService.submit {
             val foundWords =
                 findAllWords(database, cleanedInputLetters).sortedWith(compareByDescending<String> { it.length }.thenBy { it })
+// Kontynuacja kodu klasy MainActivity
+
             runOnUiThread {
                 adapter.clear()
                 adapter.addAll(foundWords)
@@ -279,16 +294,13 @@ class MainActivity : AppCompatActivity() {
             return false
         }
 
-        val letters = mutableMapOf<Char, Int>()
-        for (letter in inputLetters) {
-            letters[letter] = letters.getOrDefault(letter, 0) + 1
-        }
+        val inputCounter = inputLetters.groupingBy { it }.eachCount().toMutableMap()
+        val wordCounter = word.groupingBy { it }.eachCount()
 
-        for (letter in word) {
-            if (!letters.containsKey(letter) || letters[letter]!! < 1) {
+        for ((char, count) in wordCounter) {
+            if (inputCounter.getOrDefault(char, 0) < count) {
                 return false
             }
-            letters[letter] = letters[letter]!! - 1
         }
 
         return true
@@ -299,3 +311,4 @@ class MainActivity : AppCompatActivity() {
         executorService.shutdown()
     }
 }
+
