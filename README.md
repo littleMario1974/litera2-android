@@ -4,12 +4,12 @@ Users can enter letters, and the application will find words that can be formed 
 
 For example, if you enter "lit" it will find:
 
-- "lit"
-- "tli"
+- lit
+- tli
 
 If you press "Search all" it will find:
 
-- "lit"
-- "tli"
-- "il"
-- "li"
+- lit
+- tli
+- il
+- li
