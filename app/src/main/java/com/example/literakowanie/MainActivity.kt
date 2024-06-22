@@ -233,15 +233,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         executorService.submit {
-            val inputCounter = cleanedInputLetters.groupingBy { it }.eachCount().toMutableMap()
             val foundWords = mutableListOf<String>()
-
-            val combinations = generateCombinations(inputLetters)
+            val combinations = generateCombinations(cleanedInputLetters)
 
             for (combination in combinations) {
-                val counter = combination.groupingBy { it }.eachCount().toMutableMap()
+                val combinationCounter = combination.groupingBy { it }.eachCount().toMutableMap()
                 for (word in database) {
-                    if (canFormAnyWord(word, counter)) {
+                    if (canFormAnyWord(word, combinationCounter)) {
                         foundWords.add(word)
                     }
                 }
