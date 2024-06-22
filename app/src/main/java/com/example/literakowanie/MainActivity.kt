@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var clearButton: Button
     private lateinit var searchAllButton: Button
-    private lateinit var searchFromAllButton: Button // Nowy przycisk
+    private lateinit var searchFromAllButton: Button
 
     private val executorService = Executors.newFixedThreadPool(4)
     private val POLISH_LETTERS = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
@@ -37,13 +37,13 @@ class MainActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         clearButton = findViewById(R.id.clearButton)
         searchAllButton = findViewById(R.id.searchAllButton)
-        searchFromAllButton = findViewById(R.id.searchFromAllButton) // Inicjalizacja nowego przycisku
+        searchFromAllButton = findViewById(R.id.searchFromAllButton)
         val closeButton: ImageButton = findViewById(R.id.closeButton)
 
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         wordList.adapter = adapter
 
-        // Ukrycie infoLabel, progressBar, przycisków "Wyczyść", "Szukaj wszystkie" oraz inputField na początku
+        // Ukryj początkowo infoLabel, progressBar, przyciski ("Clear", "Search All", "Search From All") oraz inputField
         infoLabel.visibility = View.INVISIBLE
         progressBar.visibility = View.GONE
         clearButton.visibility = View.GONE
@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         loadDatabaseFromFile()
 
         inputField.apply {
-            // Ustawienie flagi dla EditText, aby wyłączyć korektę słów
             inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
 
             addTextChangedListener(object : TextWatcher {
@@ -64,43 +63,36 @@ class MainActivity : AppCompatActivity() {
                     if (s != null) {
                         val newText = s.toString()
 
-                        // Wyczyszczenie adaptera przechowującego znalezione słowa
                         adapter.clear()
-
-                        // Ukrycie infoLabel po zmianie tekstu
                         infoLabel.visibility = View.INVISIBLE
 
-                        // Walidacja ilości spacji
                         val numSpaces = newText.count { it == ' ' }
                         if (numSpaces > 1) {
                             Toast.makeText(
                                 this@MainActivity,
-                                "Dozwolona jedna spacja.",
+                                "Dozwolona jest tylko jedna spacja.",
                                 Toast.LENGTH_SHORT
                             ).show()
 
-                            // Usunięcie nadmiarowych spacji, pozostawiając pierwszą
                             val firstSpaceIndex = newText.indexOf(' ')
                             val sanitizedText = newText.substring(0, firstSpaceIndex + 1) +
                                     newText.substring(firstSpaceIndex + 1).replace(" ", "")
                             setText(sanitizedText)
-                            setSelection(length()) // Ustawienie kursora na końcu
+                            setSelection(length())
                             return
                         }
 
-                        // Walidacja niedozwolonych znaków
                         val disallowedChar = newText.find { it !in POLISH_LETTERS && it != ' ' }
                         if (disallowedChar != null) {
                             Toast.makeText(
                                 this@MainActivity,
-                                "Niedozwolony znak.",
+                                "Nieprawidłowy znak.",
                                 Toast.LENGTH_SHORT
                             ).show()
 
-                            // Usunięcie niedozwolonego znaku
                             val sanitizedText = newText.replace(disallowedChar.toString(), "", true)
                             setText(sanitizedText)
-                            setSelection(length()) // Ustawienie kursora na końcu
+                            setSelection(length())
                             return
                         }
                     }
@@ -113,31 +105,30 @@ class MainActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             inputField.text.clear()
             adapter.clear()
-            // Ukrycie infoLabel po wciśnięciu "Wyczyść"
             infoLabel.visibility = View.INVISIBLE
         }
 
         searchAllButton.setOnClickListener {
-            val inputText = inputField.text.toString().trim()
+            val inputText = inputField.text.toString()
             if (inputText.length >= 3) {
                 searchAllWords(inputText)
             } else {
                 Toast.makeText(
                     this,
-                    "Wprowadź przynajmniej trzy litery do wyszukania wszystkich słów.",
+                    "Wpisz co najmniej trzy litery, aby wyszukać wszystkie słowa.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
         }
 
         searchFromAllButton.setOnClickListener {
-            val inputText = inputField.text.toString().trim()
+            val inputText = inputField.text.toString()
             if (inputText.length >= 3) {
                 searchWords(inputText)
             } else {
                 Toast.makeText(
                     this,
-                    "Wprowadź przynajmniej trzy litery do wyszukania z wszystkich słów.",
+                    "Wpisz co najmniej trzy litery, aby wyszukać z dostępnych słów.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -150,7 +141,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadDatabaseFromFile() {
         progressBar.visibility = View.VISIBLE
-        progressBar.progress = 0 // Ustawienie początkowego postępu
+        progressBar.progress = 0
 
         executorService.submit {
             val database = mutableListOf<String>()
@@ -163,16 +154,15 @@ class MainActivity : AppCompatActivity() {
                 var bytesRead = 0
 
                 while (dataInputStream.available() > 0) {
-                    val length = dataInputStream.readInt()  // read word length
+                    val length = dataInputStream.readInt()
                     val bytes = ByteArray(length)
-                    dataInputStream.read(bytes)  // read bytes
-                    val word = String(bytes, Charsets.UTF_8)  // convert to String
+                    dataInputStream.read(bytes)
+                    val word = String(bytes, Charsets.UTF_8)
                     database.add(word)
 
                     totalRead += length
                     bytesRead += length
 
-                    // Aktualizacja ProgressBar co 10% postępu
                     if (bytesRead >= fileSize * 0.1 || dataInputStream.available() == 0) {
                         val progress = ((totalRead / fileSize) * 100).toInt()
                         runOnUiThread {
@@ -191,12 +181,11 @@ class MainActivity : AppCompatActivity() {
 
             runOnUiThread {
                 progressBar.visibility = View.GONE
-                inputField.visibility = View.VISIBLE // Pokaż pole do wpisywania liter po wczytaniu bazy
-                clearButton.visibility = View.VISIBLE // Pokaż przycisk "Wyczyść" po wczytaniu bazy
-                searchAllButton.visibility = View.VISIBLE // Pokaż przycisk "Szukaj wszystkie" po wczytaniu bazy
-                searchFromAllButton.visibility = View.VISIBLE // Pokaż przycisk "Szukaj z wszystkich" po wczytaniu bazy
+                inputField.visibility = View.VISIBLE
+                clearButton.visibility = View.VISIBLE
+                searchAllButton.visibility = View.VISIBLE
+                searchFromAllButton.visibility = View.VISIBLE
 
-                // Ustawienie fokusu na pole do wpisywania liter i pokazanie klawiatury wirtualnej
                 inputField.requestFocus()
                 val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(inputField, InputMethodManager.SHOW_IMPLICIT)
@@ -206,7 +195,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun searchWords(inputLetters: String) {
         if (inputLetters.isEmpty()) {
-            // Jeśli inputLetters jest pusty, nie robimy wyszukiwania
             adapter.clear()
             infoLabel.visibility = View.INVISIBLE
             return
@@ -215,7 +203,7 @@ class MainActivity : AppCompatActivity() {
         val letterCount = cleanedInputLetters.length
 
         runOnUiThread {
-            infoLabel.text = "Szukam..."
+            infoLabel.text = "Szukanie..."
             infoLabel.visibility = View.VISIBLE
             infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
         }
@@ -226,10 +214,10 @@ class MainActivity : AppCompatActivity() {
                 adapter.clear()
                 adapter.addAll(foundWords)
                 if (foundWords.isEmpty()) {
-                    infoLabel.text = "Nie znaleziono żadnego słowa."
+                    infoLabel.text = "Brak znalezionych słów."
                     infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
                 } else {
-                    infoLabel.text = "Oto pasujące słowa"
+                    infoLabel.text = "Oto pasujące słowa."
                     infoLabel.setTextColor(getColor(android.R.color.holo_green_dark))
                 }
             }
@@ -240,21 +228,26 @@ class MainActivity : AppCompatActivity() {
         val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault())
 
         runOnUiThread {
-            infoLabel.text = "Szukam wszystkich słów..."
+            infoLabel.text = "Szukanie wszystkich słów..."
             infoLabel.visibility = View.VISIBLE
             infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
         }
 
         executorService.submit {
-            val foundWords =
-                findAllWords(database, cleanedInputLetters).sortedWith(compareByDescending<String> { it.length }.thenBy { it })
-// Kontynuacja kodu klasy MainActivity
+            val inputCounter = cleanedInputLetters.groupingBy { it }.eachCount().toMutableMap()
+            val foundWords = mutableListOf<String>()
+
+            for (word in database) {
+                if (canFormAnyWord(word, inputCounter)) {
+                    foundWords.add(word)
+                }
+            }
 
             runOnUiThread {
                 adapter.clear()
-                adapter.addAll(foundWords)
+                adapter.addAll(foundWords.sortedWith(compareByDescending<String> { it.length }.thenBy { it }))
                 if (foundWords.isEmpty()) {
-                    infoLabel.text = "Nie znaleziono żadnego słowa."
+                    infoLabel.text = "Brak znalezionych słów."
                     infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
                 } else {
                     infoLabel.text = "Oto wszystkie możliwe słowa."
@@ -279,16 +272,6 @@ class MainActivity : AppCompatActivity() {
         return foundWords
     }
 
-    private fun findAllWords(database: List<String>, inputLetters: String): List<String> {
-        val foundWords = mutableListOf<String>()
-        for (word in database) {
-            if (canFormWord(word, inputLetters, word.length)) {
-                foundWords.add(word)
-            }
-        }
-        return foundWords
-    }
-
     private fun canFormWord(word: String, inputLetters: String, letterCount: Int): Boolean {
         if (word.length != letterCount) {
             return false
@@ -306,9 +289,21 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    private fun canFormAnyWord(word: String, inputCounter: MutableMap<Char, Int>): Boolean {
+        val wordCounter = word.groupingBy { it }.eachCount()
+
+        for ((char, count)
+        in wordCounter) {
+            if (inputCounter.getOrDefault(char, 0) < count) {
+                return false
+            }
+        }
+
+        return true
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         executorService.shutdown()
     }
 }
-
