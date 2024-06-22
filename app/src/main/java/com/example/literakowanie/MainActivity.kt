@@ -233,14 +233,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         executorService.submit {
+            val inputLength = cleanedInputLetters.length
             val foundWords = mutableListOf<String>()
-            val combinations = generateCombinations(cleanedInputLetters)
 
-            for (combination in combinations) {
-                val combinationCounter = combination.groupingBy { it }.eachCount().toMutableMap()
-                for (word in database) {
-                    if (canFormAnyWord(word, combinationCounter)) {
-                        foundWords.add(word)
+            if (inputLength >= 3) {
+                // Generowanie wszystkich możliwych kombinacji
+                val combinations = generateCombinations(inputLetters)
+
+                // Przeszukiwanie bazy danych
+                for (combination in combinations) {
+                    val combinationLength = combination.length
+                    if (combinationLength <= inputLength) {
+                        val inputCounter = combination.groupingBy { it }.eachCount().toMutableMap()
+                        for (word in database) {
+                            if (word.length <= inputLength && canFormAnyWord(word, inputCounter)) {
+                                foundWords.add(word)
+                            }
+                        }
                     }
                 }
             }
@@ -258,6 +267,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun generateCombinations(inputLetters: String): List<String> {
         val combinations = mutableListOf<String>()
