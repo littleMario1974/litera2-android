@@ -200,7 +200,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault())
-        val letterCount = cleanedInputLetters.length
 
         runOnUiThread {
             infoLabel.text = "Szukanie..."
@@ -209,7 +208,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         executorService.submit {
-            val foundWords = findWords(database, cleanedInputLetters, letterCount).sorted()
+            val foundWords = findWords(database, cleanedInputLetters).sorted()
             runOnUiThread {
                 adapter.clear()
                 adapter.addAll(foundWords)
@@ -237,15 +236,20 @@ class MainActivity : AppCompatActivity() {
             val inputCounter = cleanedInputLetters.groupingBy { it }.eachCount().toMutableMap()
             val foundWords = mutableListOf<String>()
 
-            for (word in database) {
-                if (canFormAnyWord(word, inputCounter)) {
-                    foundWords.add(word)
+            val combinations = generateCombinations(inputLetters)
+
+            for (combination in combinations) {
+                val counter = combination.groupingBy { it }.eachCount().toMutableMap()
+                for (word in database) {
+                    if (canFormAnyWord(word, counter)) {
+                        foundWords.add(word)
+                    }
                 }
             }
 
             runOnUiThread {
                 adapter.clear()
-                adapter.addAll(foundWords.sortedWith(compareByDescending<String> { it.length }.thenBy { it }))
+                adapter.addAll(foundWords.distinct().sortedWith(compareByDescending<String> { it.length }.thenBy { it }))
                 if (foundWords.isEmpty()) {
                     infoLabel.text = "Brak znalezionych słów."
                     infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
@@ -257,16 +261,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun findWords(database: List<String>, inputLetters: String, letterCount: Int): List<String> {
+    private fun generateCombinations(inputLetters: String): List<String> {
+        val combinations = mutableListOf<String>()
+        if (inputLetters.contains(" ")) {
+            val spaceIndex = inputLetters.indexOf(" ")
+            for (letter in POLISH_LETTERS) {
+                val combination = inputLetters.substring(0, spaceIndex) + letter + inputLetters.substring(spaceIndex + 1)
+                combinations.add(combination)
+            }
+        } else {
+            combinations.add(inputLetters)
+        }
+        return combinations
+    }
+
+    private fun findWords(database: List<String>, inputLetters: String): List<String> {
         val foundWords = mutableListOf<String>()
 
         if (inputLetters.contains(" ")) {
             for (c in POLISH_LETTERS) {
                 val inputWithReplacement = inputLetters.replaceFirst(" ", c.toString())
-                foundWords.addAll(database.filter { canFormWord(it, inputWithReplacement, letterCount) })
+                foundWords.addAll(database.filter { canFormWord(it, inputWithReplacement, inputLetters.length) })
             }
         } else {
-            foundWords.addAll(database.filter { canFormWord(it, inputLetters, letterCount) })
+            foundWords.addAll(database.filter { canFormWord(it, inputLetters, inputLetters.length) })
         }
 
         return foundWords
@@ -289,11 +307,10 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun canFormAnyWord(word: String, inputCounter: MutableMap<Char, Int>): Boolean {
+    private fun canFormAnyWord(word: String, inputCounter: Map<Char, Int>): Boolean {
         val wordCounter = word.groupingBy { it }.eachCount()
 
-        for ((char, count)
-        in wordCounter) {
+        for ((char, count) in wordCounter) {
             if (inputCounter.getOrDefault(char, 0) < count) {
                 return false
             }
