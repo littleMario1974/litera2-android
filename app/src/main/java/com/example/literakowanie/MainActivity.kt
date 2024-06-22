@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(
                     this,
-                    "Wpisz co najmniej trzy litery, aby wyszukać wszystkie słowa.",
+                    "Wpisz co najmniej trzy znaki.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(
                     this,
-                    "Wpisz co najmniej trzy litery, aby wyszukać z dostępnych słów.",
+                    "Wpisz co najmniej trzy znaki.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -202,7 +202,7 @@ class MainActivity : AppCompatActivity() {
         val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault())
 
         runOnUiThread {
-            infoLabel.text = "Szukanie..."
+            infoLabel.text = "Szukam..."
             infoLabel.visibility = View.VISIBLE
             infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
         }
@@ -213,7 +213,7 @@ class MainActivity : AppCompatActivity() {
                 adapter.clear()
                 adapter.addAll(foundWords)
                 if (foundWords.isEmpty()) {
-                    infoLabel.text = "Brak znalezionych słów."
+                    infoLabel.text = "Nie znaleziono słów."
                     infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
                 } else {
                     infoLabel.text = "Oto pasujące słowa."
@@ -227,7 +227,7 @@ class MainActivity : AppCompatActivity() {
         val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault())
 
         runOnUiThread {
-            infoLabel.text = "Szukanie wszystkich słów..."
+            infoLabel.text = "Szukam wszystkich słów..."
             infoLabel.visibility = View.VISIBLE
             infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
         }
