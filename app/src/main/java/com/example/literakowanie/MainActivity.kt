@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var clearButton: Button
     private lateinit var searchAllButton: Button
     private lateinit var searchFromAllButton: Button
+    private lateinit var programDescription: TextView
 
     private val executorService = Executors.newFixedThreadPool(4)
     private val POLISH_LETTERS = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         clearButton = findViewById(R.id.clearButton)
         searchAllButton = findViewById(R.id.searchAllButton)
         searchFromAllButton = findViewById(R.id.searchFromAllButton)
-        val closeButton: ImageButton = findViewById(R.id.closeButton)
+        programDescription = findViewById(R.id.programDescription)
 
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         wordList.adapter = adapter
@@ -135,7 +136,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        closeButton.setOnClickListener {
+        findViewById<Button>(R.id.showDescriptionButton).setOnClickListener {
+            if (programDescription.visibility == View.VISIBLE) {
+                programDescription.visibility = View.GONE
+            } else {
+                programDescription.visibility = View.VISIBLE
+            }
+        }
+
+        findViewById<ImageButton>(R.id.closeButton).setOnClickListener {
             finish()
         }
     }
@@ -340,3 +349,4 @@ class MainActivity : AppCompatActivity() {
         executorService.shutdown()
     }
 }
+
