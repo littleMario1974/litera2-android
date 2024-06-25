@@ -31,9 +31,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Opis Programu"
-            app:layout_constraintTop_toBottomOf="@id/closeButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:textSize="12sp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toStartOf="@id/closeButton"
+            app:layout_constraintTop_toTopOf="@id/closeButton" />
 
         <TextView
             android:id="@+id/programDescription"
@@ -56,6 +57,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginTop="8dp"
             android:visibility="gone"
+            android:textSize="11sp"
             app:layout_constraintTop_toBottomOf="@id/programDescription"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -101,15 +103,15 @@
             android:id="@+id/searchAllButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Wyszukaj wszystkie"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/button_background"
-            app:layout_constraintWidth_percent="0.3"
-            app:layout_constraintTop_toBottomOf="@id/inputField"
-            app:layout_constraintStart_toEndOf="@id/searchFromAllButton"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:text="Szukaj wszystkie"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/button_background"
+        app:layout_constraintWidth_percent="0.3"
+        app:layout_constraintTop_toBottomOf="@id/inputField"
+        app:layout_constraintStart_toEndOf="@id/searchFromAllButton"
+        app:layout_constraintEnd_toEndOf="parent" />
 
         <ListView
             android:id="@+id/wordList"
