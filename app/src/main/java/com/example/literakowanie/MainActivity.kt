@@ -12,6 +12,7 @@ import java.io.DataInputStream
 import java.io.IOException
 import java.util.Locale
 import java.util.concurrent.Executors
+import java.text.Collator
 
 class MainActivity : AppCompatActivity() {
     private lateinit var database: MutableList<String>
@@ -193,6 +194,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Funkcja zwracająca porządek polskich liter
+    fun getPolishAlphabetOrder(): Comparator<String> {
+        val collator = Collator.getInstance(Locale("pl", "PL"))
+        return Comparator { s1, s2 -> collator.compare(s1, s2) }
+    }
+
     private fun searchWords(inputLetters: String) {
         if (inputLetters.isEmpty()) {
             adapter.clear()
@@ -208,7 +215,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         executorService.submit {
-            val foundWords = findWords(database, cleanedInputLetters).sorted()
+            val foundWords = findWords(database, cleanedInputLetters)
+                .sortedWith(compareByDescending<String> { it.length }.thenComparing(getPolishAlphabetOrder()))
             runOnUiThread {
                 adapter.clear()
                 adapter.addAll(foundWords)
@@ -256,7 +264,7 @@ class MainActivity : AppCompatActivity() {
 
             runOnUiThread {
                 adapter.clear()
-                adapter.addAll(foundWords.distinct().sortedWith(compareByDescending<String> { it.length }.thenBy { it }))
+                adapter.addAll(foundWords.distinct().sortedWith(compareByDescending<String> { it.length }.thenComparing(getPolishAlphabetOrder())))
                 if (foundWords.isEmpty()) {
                     infoLabel.text = "Brak znalezionych słów."
                     infoLabel.setTextColor(getColor(android.R.color.holo_red_dark))
