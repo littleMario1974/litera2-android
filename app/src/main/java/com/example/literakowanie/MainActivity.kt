@@ -215,7 +215,7 @@ class MainActivity : AppCompatActivity() {
             infoLabel.visibility = View.INVISIBLE
             return
         }
-        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault())
+        val cleanedInputLetters = inputLetters.lowercase(Locale.getDefault())
 
         runOnUiThread {
             infoLabel.text = "Szukam..."
@@ -242,7 +242,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun searchAllWords(inputLetters: String) {
-        val cleanedInputLetters = inputLetters.toLowerCase(Locale.getDefault())
+        val cleanedInputLetters = inputLetters.lowercase(Locale.getDefault())
 
         runOnUiThread {
             infoLabel.text = "Szukam wszystkich słów..."
