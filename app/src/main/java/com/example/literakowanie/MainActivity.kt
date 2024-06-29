@@ -225,7 +225,8 @@ class MainActivity : AppCompatActivity() {
 
         executorService.submit {
             val foundWords = findWords(database, cleanedInputLetters)
-                .sortedWith(compareByDescending<String> { it.length }.thenComparing(getPolishAlphabetOrder()))
+                .sortedWith(getPolishAlphabetOrder())
+
             runOnUiThread {
                 adapter.clear()
                 adapter.addAll(foundWords)
