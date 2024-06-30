@@ -2,23 +2,12 @@
     <string name="app_name">Litera</string>
 
     <string name="program_description_html"><![CDATA[
-        Program "Litera" umożliwia wyszukiwanie słów na podstawie wprowadzonych liter lub fraz.
-        Oto jak możesz z niego korzystać:
-        Wprowadź litery:
-        W polu tekstowym możesz wprowadzić litery, z których chcesz ułożyć słowa lub frazy do wyszukania.
-        Opcje wyszukiwania:
-        Szukaj: Po wprowadzeniu co najmniej trzech znaków możesz kliknąć przycisk "Szukaj".
-        Program znajdzie wszystkie słowa, które można ułożyć z wszystkich podanych liter.
-        Szukaj wszystkie: Jeśli chcesz znaleźć wszystkie możliwe słowa, które można ułożyć z podanych znaków, niekoniecznie z wszystkich, kliknij przycisk "Wyszukaj wszystkie".
-        Wyniki wyszukiwania:
-        Jeśli wśród wpisanych znaków jest spacja program zastępuje ją po kolei wszystkimi literami polskiego alfabetu i z takiego zestawu szuka możliwych do ułożenia słów. Uwaga ! - duża ilość liter i spacja może spowodować długie szukanie słów. Zależy to od szybkości urządzenia.
-        Dopuszczalna jest jedna spacja.
-        Znalezione słowa są wyświetlane w liście poniżej przycisków wyszukiwania.
-        Informacje o wynikach pojawiają się w dolnej części ekranu. Jeśli nie znaleziono żadnych słów, zostanie wyświetlony stosowny komunikat.
-        Czyszczenie wyników:
-        Aby wyczyścić pola tekstowe i wyniki wyszukiwania, kliknij przycisk "Wyczyść".
-        Zamykanie programu:
-        Aby zamknąć program, kliknij ikonę "X" w prawym górnym rogu ekranu.
+Program "Litera" umożliwia wyszukiwanie słów na podstawie wprowadzonych liter i spacji.
+W polu tekstowym możesz wprowadzić litery lub max. jedną spację, z których chcesz ułożyć słowa.
+Po wciśnięciu przycisku "Szukaj" program znajdzie wszystkie słowa, które można ułożyć z wszystkich podanych liter.
+Jeśli wciśniesz przycisk "Szukaj wszystkie"  program znajdzie wszystkie słowa, które można ułożyć z podanych znaków, niekoniecznie z wszystkich.
+Jeśli wśród wpisanych znaków jest spacja program zastępuje ją po kolei wszystkimi literami polskiego alfabetu. Uwaga ! - duża ilość liter i spacja może spowodować długie szukanie słów. Zależy to od szybkości urządzenia.
+        
         Autor programu: Mariusz Jurczyk-Kepke, e-mail: mariokey@go2.pl
     ]]></string>
 </resources>
