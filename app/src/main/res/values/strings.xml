@@ -2,10 +2,10 @@
     <string name="app_name">Litera</string>
 
     <string name="program_description_html"><![CDATA[
-Program "Litera" umożliwia wyszukiwanie słów na podstawie wprowadzonych liter i spacji.
-W polu tekstowym możesz wprowadzić litery lub max. jedną spację, z których chcesz ułożyć słowa.
-Po wciśnięciu przycisku "Szukaj" program znajdzie wszystkie słowa, które można ułożyć z wszystkich podanych liter.
-Jeśli wciśniesz przycisk "Szukaj wszystkie"  program znajdzie wszystkie słowa, które można ułożyć z podanych znaków, niekoniecznie z wszystkich.
+Program LITERA umożliwia wyszukiwanie słów na podstawie wprowadzonych liter i spacji.
+W polu tekstowym możesz wprowadzić litery i maksymalnie jedną spację, z których chcesz ułożyć słowa.
+Po wciśnięciu przycisku SZUKAJ program znajdzie wszystkie słowa, które można ułożyć z wszystkich podanych liter.
+Jeśli wciśniesz przycisk SZUKAJ WSZYSTKIE program znajdzie wszystkie słowa, które można ułożyć z podanych znaków, niekoniecznie z wszystkich.
 Jeśli wśród wpisanych znaków jest spacja program zastępuje ją po kolei wszystkimi literami polskiego alfabetu. Uwaga ! - duża ilość liter i spacja może spowodować długie szukanie słów. Zależy to od szybkości urządzenia.
         
         Autor programu: Mariusz Jurczyk-Kepke, e-mail: mariokey@go2.pl
