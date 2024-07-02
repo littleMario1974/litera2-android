@@ -396,7 +396,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        // Usunięcie wszystkich elementów z adaptera
+        adapter.clear()
+
+        // Usunięcie referencji do bazy danych
+        database.clear()
+
+        // Wyłączenie reklam, jeśli są używane
+        adView.destroy()
+
+        // Wyłączenie executorService
         executorService.shutdown()
+
+        super.onDestroy()
     }
+
 }
