@@ -214,8 +214,8 @@ class MainActivity : AppCompatActivity() {
                     totalRead += length
                     bytesRead += length
 
-                    if (bytesRead >= fileSize * 0.1 || dataInputStream.available() == 0) {
-                        val progress = ((totalRead / fileSize) * 100).toInt()
+                    if (bytesRead >= fileSize * 0.05 || dataInputStream.available() == 0) { // update every 5% of file size
+                        val progress = ((totalRead / fileSize) * 125).toInt()
                         runOnUiThread {
                             progressBar.progress = progress
                         }
