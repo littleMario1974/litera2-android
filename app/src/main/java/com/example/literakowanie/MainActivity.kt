@@ -322,7 +322,7 @@ class MainActivity : AppCompatActivity() {
                 adapter.clear()
                 adapter.addAll(foundWords.distinct().sortedWith(compareByDescending<String> { it.length }.thenComparing(getPolishAlphabetOrder())))
                 if (foundWords.isEmpty()) {
-                    infoLabel.text = "Brak znalezionych słów."
+                    infoLabel.text = "Nie znaleziono pasujących słów."
                     infoLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
                 } else {
                     infoLabel.text = "Oto wszystkie możliwe słowa."
