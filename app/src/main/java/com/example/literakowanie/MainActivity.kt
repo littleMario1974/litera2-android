@@ -15,6 +15,9 @@ import java.io.IOException
 import java.text.Collator
 import java.util.*
 import java.util.concurrent.Executors
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 
 class MainActivity : AppCompatActivity() {
     private lateinit var database: MutableList<String>
@@ -27,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchAllButton: Button
     private lateinit var searchFromAllButton: Button
     private lateinit var programDescription: TextView
+    private lateinit var adView: AdView
 
     private val executorService = Executors.newFixedThreadPool(4)
     private val POLISH_LETTERS = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
@@ -34,6 +38,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Inicjalizacja Mobile Ads SDK
+        MobileAds.initialize(this) {}
+
+        // Referencja do AdView z layoutu
+        adView = findViewById(R.id.adView)
+
+        // Tworzenie obiektu AdRequest i ładowanie reklamy
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
 
         inputField = findViewById(R.id.inputField)
         wordList = findViewById(R.id.wordList)
