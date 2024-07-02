@@ -162,6 +162,13 @@ class MainActivity : AppCompatActivity() {
             } else {
                 programDescription.visibility = View.VISIBLE
             }
+
+            // Zmiana koloru tekstu w zależności od trybu energooszczędnego
+            if (isPowerSaveMode()) {
+                programDescription.setTextColor(ContextCompat.getColor(this, android.R.color.white))
+            } else {
+                programDescription.setTextColor(ContextCompat.getColor(this, android.R.color.black))
+            }
         }
 
         findViewById<ImageButton>(R.id.closeButton).setOnClickListener {
@@ -186,9 +193,6 @@ class MainActivity : AppCompatActivity() {
             infoLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
         }
     }
-
-
-
 
     private fun isPowerSaveMode(): Boolean {
         // Pobierz informację o trybie energooszczędnym
@@ -249,6 +253,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     // Funkcja zwracająca porządek polskich liter
     fun getPolishAlphabetOrder(): Comparator<String> {
         val collator = Collator.getInstance(Locale("pl", "PL"))

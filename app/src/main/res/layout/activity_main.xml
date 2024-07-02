@@ -44,11 +44,12 @@
                     android:layout_height="wrap_content"
                     android:padding="16dp"
                     android:text="@string/program_description_html"
-                    android:textColor="#000000"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/showDescriptionButton" />
+                    android:textColor="#FFFFFF"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/showDescriptionButton" />
+
 
                 <ProgressBar
                     android:id="@+id/progressBar"
