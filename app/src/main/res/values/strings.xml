@@ -1,4 +1,5 @@
 <resources>
+<string name="close_button">Close</string>
     <string name="app_name">Litera</string>
 
     <string name="program_description_html"><![CDATA[

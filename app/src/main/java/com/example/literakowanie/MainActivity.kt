@@ -9,6 +9,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import java.io.DataInputStream
 import java.io.IOException
@@ -173,16 +174,21 @@ class MainActivity : AppCompatActivity() {
 
         if (isPowerSaveMode) {
             // Tryb energooszczędny
+            findViewById<ConstraintLayout>(R.id.mainLayout).setBackgroundResource(R.drawable.background_energysaver)
             inputField.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent_dark))
             wordList.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent_dark))
             infoLabel.setTextColor(ContextCompat.getColor(this, android.R.color.white))
         } else {
             // Tryb normalny
+            findViewById<ConstraintLayout>(R.id.mainLayout).setBackgroundResource(R.drawable.background)
             inputField.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent))
             wordList.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent))
             infoLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
         }
     }
+
+
+
 
     private fun isPowerSaveMode(): Boolean {
         // Pobierz informację o trybie energooszczędnym
@@ -243,7 +249,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     // Funkcja zwracająca porządek polskich liter
     fun getPolishAlphabetOrder(): Comparator<String> {
         val collator = Collator.getInstance(Locale("pl", "PL"))
