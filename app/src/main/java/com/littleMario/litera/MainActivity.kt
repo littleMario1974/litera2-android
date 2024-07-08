@@ -1,6 +1,6 @@
 package com.littleMario.litera
 
-import oandroid.os.Bundle
+import android.os.Bundle
 import android.os.PowerManager
 import android.text.Editable
 import android.text.InputType
