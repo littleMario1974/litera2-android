@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.literakowanie"
+    namespace = "com.littleMario.litera"
     compileSdk 34  // Zmiana z compileSdkVersion na compileSdk
 
     defaultConfig {
-        applicationId = "com.example.literakowanie"
+        applicationId = "com.littleMario.litera"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
