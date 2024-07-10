@@ -7,21 +7,23 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.littleMario.litera.R
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import java.io.DataInputStream
 import java.io.IOException
 import java.text.Collator
 import java.util.*
 import java.util.concurrent.Executors
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.MobileAds
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var database: MutableList<String>
     private lateinit var inputField: EditText
     private lateinit var wordList: ListView
@@ -33,6 +35,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchFromAllButton: Button
     private lateinit var programDescription: TextView
     private lateinit var adView: AdView
+    private lateinit var webView: WebView
+    private lateinit var closeButton: ImageButton
+    private lateinit var closeWebViewButton: Button
+    private lateinit var showDescriptionButton: Button
 
     private val executorService = Executors.newFixedThreadPool(4)
     private val POLISH_LETTERS = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
@@ -41,13 +47,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Inicjalizacja Mobile Ads SDK
+        // Initialize Mobile Ads SDK
         MobileAds.initialize(this) {}
 
-        // Referencja do AdView z layoutu
+        // Reference AdView from layout
         adView = findViewById(R.id.adView)
 
-        // Tworzenie obiektu AdRequest i ładowanie reklamy
+        // Create AdRequest object and load ad
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
 
@@ -59,14 +65,22 @@ class MainActivity : AppCompatActivity() {
         searchAllButton = findViewById(R.id.searchAllButton)
         searchFromAllButton = findViewById(R.id.searchFromAllButton)
         programDescription = findViewById(R.id.programDescription)
+        webView = findViewById(R.id.webView)
+        closeButton = findViewById(R.id.closeButton)
+        closeWebViewButton = findViewById(R.id.closeWebViewButton)
+        showDescriptionButton = findViewById(R.id.showDescriptionButton)
 
-        // Ustawienie kolorów tła i tekstu w zależności od trybu
+        // Initialize WebView
+        webView.settings.javaScriptEnabled = true
+        webView.webViewClient = WebViewClient()
+
+        // Set background and text colors based on power save mode
         setThemeColors()
 
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         wordList.adapter = adapter
 
-        // Ukryj początkowo infoLabel, progressBar, przyciski ("Clear", "Search All", "Search From All") oraz inputField
+        // Initially hide infoLabel, progressBar, buttons ("Clear", "Search All", "Search From All"), and inputField
         infoLabel.visibility = View.INVISIBLE
         progressBar.visibility = View.GONE
         clearButton.visibility = View.GONE
@@ -157,23 +171,73 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Button>(R.id.showDescriptionButton).setOnClickListener {
-            if (programDescription.visibility == View.VISIBLE) {
-                programDescription.visibility = View.GONE
-            } else {
-                programDescription.visibility = View.VISIBLE
-            }
-
-            // Zmiana koloru tekstu w zależności od trybu energooszczędnego
-            if (isPowerSaveMode()) {
-                programDescription.setTextColor(ContextCompat.getColor(this, android.R.color.white))
-            } else {
-                programDescription.setTextColor(ContextCompat.getColor(this, android.R.color.black))
+        wordList.setOnItemClickListener { _, _, position, _ ->
+            val selectedWord = adapter.getItem(position)
+            if (selectedWord != null) {
+                val url = "https://sjp.pl/$selectedWord"
+                webView.loadUrl(url)
+                showWebView()
             }
         }
 
-        findViewById<ImageButton>(R.id.closeButton).setOnClickListener {
+        closeWebViewButton.setOnClickListener {
+            hideWebView()
+        }
+
+        showDescriptionButton.setOnClickListener {
+            toggleProgramDescriptionVisibility()
+        }
+
+        closeButton.setOnClickListener {
             finish()
+        }
+    }
+
+    private fun showWebView() {
+        webView.visibility = View.VISIBLE
+        wordList.visibility = View.GONE
+        inputField.visibility = View.GONE
+        clearButton.visibility = View.GONE
+        searchAllButton.visibility = View.GONE
+        searchFromAllButton.visibility = View.GONE
+        infoLabel.visibility = View.GONE
+        programDescription.visibility = View.GONE
+        closeWebViewButton.visibility = View.VISIBLE
+        showDescriptionButton.visibility = View.GONE // Ukryj przycisk OPIS PROGRAMU
+
+        // Ustawianie przycisku "ZAMKNIJ" na górze po prawej stronie
+        val params = closeWebViewButton.layoutParams as ConstraintLayout.LayoutParams
+        params.topMargin = resources.getDimensionPixelSize(R.dimen.close_button_top_margin)
+        params.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+        closeWebViewButton.layoutParams = params
+    }
+
+    private fun hideWebView() {
+        webView.visibility = View.GONE
+        wordList.visibility = View.VISIBLE
+        inputField.visibility = View.VISIBLE
+        clearButton.visibility = View.VISIBLE
+        searchAllButton.visibility = View.VISIBLE
+        searchFromAllButton.visibility = View.VISIBLE
+        if (adapter.isEmpty) {
+            infoLabel.visibility = View.VISIBLE
+        }
+        closeWebViewButton.visibility = View.GONE
+        showDescriptionButton.visibility = View.VISIBLE // Pokaż przycisk OPIS PROGRAMU
+    }
+
+
+    private fun toggleProgramDescriptionVisibility() {
+        if (programDescription.visibility == View.VISIBLE) {
+            programDescription.visibility = View.GONE
+        } else {
+            programDescription.visibility = View.VISIBLE
+        }
+
+        if (isPowerSaveMode()) {
+            programDescription.setTextColor(ContextCompat.getColor(this, android.R.color.white))
+        } else {
+            programDescription.setTextColor(ContextCompat.getColor(this, android.R.color.black))
         }
     }
 
@@ -181,13 +245,11 @@ class MainActivity : AppCompatActivity() {
         val isPowerSaveMode = isPowerSaveMode()
 
         if (isPowerSaveMode) {
-            // Tryb energooszczędny
             findViewById<ConstraintLayout>(R.id.mainLayout).setBackgroundResource(R.drawable.background_energysaver)
             inputField.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent_dark))
             wordList.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent_dark))
             infoLabel.setTextColor(ContextCompat.getColor(this, android.R.color.white))
         } else {
-            // Tryb normalny
             findViewById<ConstraintLayout>(R.id.mainLayout).setBackgroundResource(R.drawable.background)
             inputField.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent))
             wordList.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent))
@@ -196,7 +258,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isPowerSaveMode(): Boolean {
-        // Pobierz informację o trybie energooszczędnym
         val powerManager = getSystemService(POWER_SERVICE) as PowerManager
         return powerManager.isPowerSaveMode
     }
@@ -225,8 +286,8 @@ class MainActivity : AppCompatActivity() {
                     totalRead += length
                     bytesRead += length
 
-                    if (bytesRead >= fileSize * 0.05 || dataInputStream.available() == 0) { // update every 5% of file size
-                        val progress = ((totalRead / fileSize) * 125).toInt()
+                    if (bytesRead >= fileSize * 0.05 || dataInputStream.available() == 0) {
+                        val progress = ((totalRead / fileSize) * 100).toInt()
                         runOnUiThread {
                             progressBar.progress = progress
                         }
@@ -255,7 +316,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Funkcja zwracająca porządek polskich liter
     fun getPolishAlphabetOrder(): Comparator<String> {
         val collator = Collator.getInstance(Locale("pl", "PL"))
         return Comparator { s1, s2 -> collator.compare(s1, s2) }
@@ -307,10 +367,8 @@ class MainActivity : AppCompatActivity() {
             val foundWords = mutableListOf<String>()
 
             if (inputLength >= 3) {
-                // Generowanie wszystkich możliwych kombinacji
                 val combinations = generateCombinations(inputLetters)
 
-                // Przeszukiwanie bazy danych
                 for (combination in combinations) {
                     val combinationLength = combination.length
                     if (combinationLength <= inputLength) {
@@ -397,18 +455,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        // Usunięcie wszystkich elementów z adaptera
         adapter.clear()
-
-        // Usunięcie referencji do bazy danych
-        database.clear()
-
-        // Wyłączenie reklam, jeśli są używane
+        if (::database.isInitialized) {
+            database.clear()
+        }
         adView.destroy()
-
-        // Wyłączenie executorService
         executorService.shutdown()
-
         super.onDestroy()
     }
 
