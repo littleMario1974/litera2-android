@@ -47,13 +47,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Initialize Mobile Ads SDK
+        // Inicjalizacja Mobile Ads SDK
         MobileAds.initialize(this) {}
 
-        // Reference AdView from layout
+        // Odwołanie do AdView z layoutu
         adView = findViewById(R.id.adView)
 
-        // Create AdRequest object and load ad
+        // Inicjalizacja WebView
+        webView = findViewById(R.id.webView)
+        webView.settings.javaScriptEnabled = true
+        webView.webViewClient = WebViewClient()
+
+        // Utworzenie obiektu AdRequest i załadowanie reklamy
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
 
@@ -65,22 +70,17 @@ class MainActivity : AppCompatActivity() {
         searchAllButton = findViewById(R.id.searchAllButton)
         searchFromAllButton = findViewById(R.id.searchFromAllButton)
         programDescription = findViewById(R.id.programDescription)
-        webView = findViewById(R.id.webView)
         closeButton = findViewById(R.id.closeButton)
         closeWebViewButton = findViewById(R.id.closeWebViewButton)
         showDescriptionButton = findViewById(R.id.showDescriptionButton)
 
-        // Initialize WebView
-        webView.settings.javaScriptEnabled = true
-        webView.webViewClient = WebViewClient()
-
-        // Set background and text colors based on power save mode
+        // Ustawienie kolorów tła i tekstu na podstawie trybu oszczędzania energii
         setThemeColors()
 
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         wordList.adapter = adapter
 
-        // Initially hide infoLabel, progressBar, buttons ("Clear", "Search All", "Search From All"), and inputField
+        // Początkowo ukryj infoLabel, progressBar, przyciski ("Clear", "Search All", "Search From All") i inputField
         infoLabel.visibility = View.INVISIBLE
         progressBar.visibility = View.GONE
         clearButton.visibility = View.GONE
@@ -201,16 +201,18 @@ class MainActivity : AppCompatActivity() {
         searchAllButton.visibility = View.GONE
         searchFromAllButton.visibility = View.GONE
         infoLabel.visibility = View.GONE
+        // Ukryj pole opisu programu
         programDescription.visibility = View.GONE
         closeWebViewButton.visibility = View.VISIBLE
-        showDescriptionButton.visibility = View.GONE // Ukryj przycisk OPIS PROGRAMU
+        showDescriptionButton.visibility = View.GONE
 
-        // Ustawianie przycisku "ZAMKNIJ" na górze po prawej stronie
+        // Ustaw przycisk "ZAMKNIJ" na górze po prawej stronie
         val params = closeWebViewButton.layoutParams as ConstraintLayout.LayoutParams
         params.topMargin = resources.getDimensionPixelSize(R.dimen.close_button_top_margin)
         params.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
         closeWebViewButton.layoutParams = params
     }
+
 
     private fun hideWebView() {
         webView.visibility = View.GONE
@@ -219,11 +221,10 @@ class MainActivity : AppCompatActivity() {
         clearButton.visibility = View.VISIBLE
         searchAllButton.visibility = View.VISIBLE
         searchFromAllButton.visibility = View.VISIBLE
-        if (adapter.isEmpty) {
-            infoLabel.visibility = View.VISIBLE
-        }
+        // Ukryj przycisk zamknięcia
         closeWebViewButton.visibility = View.GONE
-        showDescriptionButton.visibility = View.VISIBLE // Pokaż przycisk OPIS PROGRAMU
+        // Pokaż przycisk do wyświetlania opisu programu
+        showDescriptionButton.visibility = View.VISIBLE
     }
 
 
@@ -316,7 +317,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun getPolishAlphabetOrder(): Comparator<String> {
+    private fun getPolishAlphabetOrder(): Comparator<String> {
         val collator = Collator.getInstance(Locale("pl", "PL"))
         return Comparator { s1, s2 -> collator.compare(s1, s2) }
     }
