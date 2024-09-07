@@ -147,12 +147,12 @@ class MainActivity : AppCompatActivity() {
 
         searchAllButton.setOnClickListener {
             val inputText = inputField.text.toString()
-            if (inputText.length >= 3) {
+            if (inputText.length >= 2) {
                 searchAllWords(inputText)
             } else {
                 Toast.makeText(
                     this,
-                    "Wpisz co najmniej trzy znaki.",
+                    "Wpisz co najmniej dwa znaki.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -160,12 +160,12 @@ class MainActivity : AppCompatActivity() {
 
         searchFromAllButton.setOnClickListener {
             val inputText = inputField.text.toString()
-            if (inputText.length >= 3) {
+            if (inputText.length >= 2) {
                 searchWords(inputText)
             } else {
                 Toast.makeText(
                     this,
-                    "Wpisz co najmniej trzy znaki.",
+                    "Wpisz co najmniej dwa znaki.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
