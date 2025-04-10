@@ -367,7 +367,7 @@ class MainActivity : AppCompatActivity() {
             val inputLength = cleanedInputLetters.length
             val foundWords = mutableListOf<String>()
 
-            if (inputLength >= 3) {
+            if (inputLength >= 2) {
                 val combinations = generateCombinations(inputLetters)
 
                 for (combination in combinations) {
