@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:layout_margin="16dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="8dp"
-    app:cardBackgroundColor="#FFFFFF">
+    app:cardElevation="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainLayout"
@@ -15,153 +14,133 @@
         android:layout_height="match_parent"
         android:background="@drawable/background">
 
+        <!-- CLOSE -->
         <ImageButton
             android:id="@+id/closeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_close"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/close_button"
-            android:onClick="onCloseButtonClick"
             android:padding="8dp"
-            android:layout_marginTop="@dimen/close_button_top_margin"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
+        <!-- OPIS PROGRAMU -->
         <Button
             android:id="@+id/showDescriptionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="Opis Programu"
+            android:text="Opis"
             android:textSize="12sp"
             app:layout_constraintEnd_toStartOf="@id/closeButton"
-            app:layout_constraintTop_toTopOf="@id/closeButton"
-            android:layout_marginTop="@dimen/close_button_top_margin" />
+            app:layout_constraintTop_toTopOf="@id/closeButton"/>
 
         <TextView
             android:id="@+id/programDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:padding="12dp"
             android:text="@string/program_description_html"
-            android:textColor="#FFFFFF"
             android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/showDescriptionButton"
-            android:layout_marginTop="16dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
+        <!-- PROGRESS -->
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
             android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_margin="12dp"
+            app:layout_constraintTop_toBottomOf="@id/programDescription"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/programDescription" />
+            app:layout_constraintEnd_toEndOf="parent"/>
 
+        <!-- OPIS "SZUKAJ" -->
+        <TextView
+            android:id="@+id/searchLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Szukaj:"
+            android:textStyle="bold"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@id/progressBar"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <!-- INPUT -->
         <EditText
             android:id="@+id/inputField"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:hint="Wpisz litery"
+            android:hint="np. a?bc"
             android:inputType="textNoSuggestions"
+            app:layout_constraintTop_toBottomOf="@id/searchLabel"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/progressBar" />
+            android:layout_margin="16dp"/>
 
-        <Button
-            android:id="@+id/clearButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/button_background"
-            android:text="Wyczyść"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/inputField"
-            app:layout_constraintWidth_percent="0.3" />
-
+        <!-- JEDEN PRZYCISK -->
         <Button
             android:id="@+id/searchFromAllButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/button_background"
             android:text="Szukaj"
-            app:layout_constraintStart_toEndOf="@id/clearButton"
-            app:layout_constraintTop_toBottomOf="@id/inputField"
-            app:layout_constraintWidth_percent="0.3" />
-
-        <Button
-            android:id="@+id/searchAllButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
             android:background="@drawable/button_background"
-            android:text="Szukaj wszystkie"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/searchFromAllButton"
+            android:layout_margin="16dp"
             app:layout_constraintTop_toBottomOf="@id/inputField"
-            app:layout_constraintWidth_percent="0.3" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
+        <!-- LISTA -->
         <ListView
             android:id="@+id/wordList"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="16dp"
-            app:layout_constraintBottom_toTopOf="@+id/infoLabel"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/searchFromAllButton"
+            app:layout_constraintBottom_toTopOf="@id/infoLabel"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/searchAllButton" />
+            app:layout_constraintEnd_toEndOf="parent"/>
 
+        <!-- INFO -->
         <TextView
             android:id="@+id/infoLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
             android:text=""
             android:textAlignment="center"
-            android:textColor="@android:color/holo_green_dark"
-            app:layout_constraintBottom_toTopOf="@+id/adView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_margin="12dp"
+            app:layout_constraintBottom_toTopOf="@id/adView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
+        <!-- ADS -->
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             ads:adSize="BANNER"
             ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
+        <!-- WEB -->
         <WebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/closeWebViewButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Zamknij"
-            android:layout_marginTop="16dp"
             android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
