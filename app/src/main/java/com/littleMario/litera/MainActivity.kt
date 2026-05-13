@@ -12,25 +12,14 @@ import java.io.DataInputStream
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var engine: MoveFinderV8
+    private lateinit var engine: MoveFinderV9
 
-    // -------------------------------------------------
-    // GLOBAL ALPHABET
-    // -------------------------------------------------
     private val alphabet =
         "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
 
-    // -------------------------------------------------
-    // BOARD STATE (UI)
-    // -------------------------------------------------
     private val boardState =
-        mutableStateOf(
-            Array(15) { Array<Char?>(15) { null } }
-        )
+        mutableStateOf(Array(15) { Array<Char?>(15) { null } })
 
-    // -------------------------------------------------
-    // RACK
-    // -------------------------------------------------
     val rack = mutableStateOf(
         mutableListOf('k', 'o', 't', 'a', 'm', 'r', 'y')
     )
@@ -38,9 +27,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // -------------------------------------------------
-        // LOAD DAWG
-        // -------------------------------------------------
         val reader = DawgReader()
 
         val root = reader.load(
@@ -49,38 +35,10 @@ class MainActivity : AppCompatActivity() {
 
         println("✅ DAWG LOADED")
 
-        // -------------------------------------------------
-        // DEBUG
-        // -------------------------------------------------
-        val debug = DawgDebugView(root, alphabet)
-
-        debug.printTree(maxDepth = 3)
-        debug.printWordPath("kot")
-        debug.printWordPath("dom")
-        debug.printWordPath("żaba")
-
-        val testWords = listOf(
-            "kot",
-            "dom",
-            "żaba",
-            "pies",
-            "samochód",
-            "książka"
-        )
-
-        DawgValidator(root, alphabet).checkAll(testWords)
-
-        println("ALPHABET CHECK:")
-        listOf('k', 'o', 't', 'a', 'm', 'r', 'y').forEach {
-            println("$it -> ${alphabet.indexOf(it)}")
-        }
-
-        // -------------------------------------------------
-        // ENGINE (NA PUSTEJ PLANSZY – START)
-        // -------------------------------------------------
         val board = Board()
 
-        engine = MoveFinderV8(
+        // 🔥 V9 ENGINE (GLOBALNY)
+        engine = MoveFinderV9(
             root,
             board,
             Anchor(),
@@ -91,9 +49,6 @@ class MainActivity : AppCompatActivity() {
 
         println("✅ ENGINE READY")
 
-        // -------------------------------------------------
-        // UI
-        // -------------------------------------------------
         setContent {
             LiterakiScreen(
                 boardState = boardState,
@@ -101,16 +56,12 @@ class MainActivity : AppCompatActivity() {
                 solver = { boardArray, letters ->
 
                     println("🔥 SOLVER START")
-                    println("letters = $letters")
 
-                    // KONWERSJA UI -> ENGINE BOARD
                     val engineBoard = boardArray.toBoard()
-
-                    val anchors = Anchor().get(engineBoard)
-                    println("ANCHORS = $anchors")
 
                     val rackMap = letters.groupingBy { it }.eachCount()
 
+                    // 🔥 KLUCZ: V9 używa aktualnej planszy
                     val moves = engine.find(rackMap)
 
                     println("🔥 MOVES FOUND: ${moves.size}")
@@ -122,18 +73,13 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-// -------------------------------------------------
-// KONWERTER UI -> ENGINE BOARD
-// -------------------------------------------------
 fun Array<Array<Char?>>.toBoard(): Board {
 
     val board = Board()
 
     for (r in 0 until 15) {
         for (c in 0 until 15) {
-
             val ch = this[r][c]
-
             if (ch != null) {
                 board.set(r, c, ch)
             }
@@ -142,4 +88,3 @@ fun Array<Array<Char?>>.toBoard(): Board {
 
     return board
 }
-
