@@ -17,4 +17,8 @@ class Board {
 
     fun isEmpty(): Boolean =
         grid.all { row -> row.all { it == null } }
+
+    fun inBounds(r: Int, c: Int): Boolean {
+        return r in 0 until 15 && c in 0 until 15
+    }
 }

@@ -1,28 +1,50 @@
 package com.littleMario.litera.ui
 
-import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.view.View
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.littleMario.litera.ui.getBonusColor
 
-class BoardView(context: Context): View(context) {
+@Composable
+fun BoardView(
+    board: Array<Array<Char?>>,
+    onCellClick: (Int, Int) -> Unit
+) {
 
-    private val paint = Paint()
+    Column(
+        modifier = Modifier
+            .background(Color(0xFF1B5E20))
+            .padding(4.dp)
+    ) {
 
-    override fun onDraw(canvas: Canvas) {
+        for (r in 0 until 15) {
 
-        val size = width / 15f
+            Row {
 
-        for (y in 0 until 15) {
-            for (x in 0 until 15) {
+                for (c in 0 until 15) {
 
-                canvas.drawRect(
-                    x*size,
-                    y*size,
-                    (x+1)*size,
-                    (y+1)*size,
-                    paint
-                )
+                    val bonus = getBonusColor(r, c)
+                    val letter = board[r][c]
+
+                    Box(
+                        modifier = Modifier
+                            .size(22.dp)
+                            .background(bonus)
+                            .border(1.dp, Color.Black)
+                            .clickable { onCellClick(r, c) }
+                    ) {
+                        Text(
+                            text = letter?.toString() ?: "",
+                            color = Color.White
+                        )
+                    }
+                }
             }
         }
     }

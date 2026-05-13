@@ -1,10 +1,17 @@
 package com.littleMario.litera.ui
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import com.littleMario.litera.engine.Move
 
-class MovePreview {
+@Composable
+fun MovePreview(moves: List<Move>) {
 
-    fun show(move: Move) {
-        println("BEST: ${move.word} -> ${move.score}")
+    Column {
+
+        moves.take(10).forEach { move ->
+            Text("${move.word}  ${move.score}")
+        }
     }
 }

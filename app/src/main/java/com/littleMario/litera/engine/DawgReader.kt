@@ -4,27 +4,35 @@ import java.io.DataInputStream
 
 class DawgReader {
 
-    private val alphabet = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
+    fun load(input: DataInputStream): Node {
 
-    private lateinit var root: Node
+        val size = input.readInt()
 
-    fun load(input: DataInputStream) {
-        root = read(input)
-    }
+        val nodes = Array(size) { Node() }
 
-    private fun read(input: DataInputStream): Node {
+        // 1. najpierw tworzymy wszystkie węzły
+        for (i in 0 until size) {
+            nodes[i] = Node()
+        }
 
-        val node = Node()
-        node.terminal = input.readBoolean()
+        // 2. teraz uzupełniamy dane
+        for (i in 0 until size) {
 
-        for (i in alphabet.indices) {
-            if (input.readBoolean()) {
-                node.next[i] = read(input)
+            val terminal = input.readBoolean()
+            val edgeCount = input.readInt()
+
+            val node = nodes[i]
+            node.terminal = terminal
+
+            repeat(edgeCount) {
+
+                val charIdx = input.readInt()
+                val targetId = input.readInt()
+
+                node.next[charIdx] = nodes[targetId]
             }
         }
 
-        return node
+        return nodes[0]
     }
-
-    fun getRoot() = root
 }
