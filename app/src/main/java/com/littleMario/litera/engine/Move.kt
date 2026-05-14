@@ -5,5 +5,6 @@ data class Move(
     val row: Int,
     val col: Int,
     val direction: String,
-    val score: Int
+    val score: Int,
+    val placements: List<Placement>
 )

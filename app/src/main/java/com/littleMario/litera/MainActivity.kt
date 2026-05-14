@@ -5,17 +5,13 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.mutableStateOf
 import com.littleMario.litera.engine.*
-import com.littleMario.litera.engine.debug.DawgDebugView
-import com.littleMario.litera.engine.debug.DawgValidator
 import com.littleMario.litera.ui.LiterakiScreen
 import java.io.DataInputStream
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var engine: MoveFinderV9
-
-    private val alphabet =
-        "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"
+    private lateinit var root: Node
+    private var engineBoard: Board = Board()
 
     private val boardState =
         mutableStateOf(Array(15) { Array<Char?>(15) { null } })
@@ -29,25 +25,11 @@ class MainActivity : AppCompatActivity() {
 
         val reader = DawgReader()
 
-        val root = reader.load(
+        root = reader.load(
             DataInputStream(assets.open("dictionary.dawg"))
         )
 
-        println("✅ DAWG LOADED")
-
-        val board = Board()
-
-        // 🔥 V9 ENGINE (GLOBALNY)
-        engine = MoveFinderV9(
-            root,
-            board,
-            Anchor(),
-            MoveValidator(root),
-            Scoring(BonusTiles()),
-            CrossCheckBuilder.build(board)
-        )
-
-        println("✅ ENGINE READY")
+        engineBoard = Board()
 
         setContent {
             LiterakiScreen(
@@ -55,36 +37,41 @@ class MainActivity : AppCompatActivity() {
                 rack = rack,
                 solver = { boardArray, letters ->
 
-                    println("🔥 SOLVER START")
+                    // RESET PLANSZY
+                    for (r in 0 until 15) {
+                        for (c in 0 until 15) {
+                            engineBoard.set(r, c, null)
+                        }
+                    }
 
-                    val engineBoard = boardArray.toBoard()
+                    // KOPIA STANU UI -> ENGINE
+                    for (r in 0 until 15) {
+                        for (c in 0 until 15) {
+                            boardArray[r][c]?.let {
+                                engineBoard.set(r, c, it)
+                            }
+                        }
+                    }
 
                     val rackMap = letters.groupingBy { it }.eachCount()
 
-                    // 🔥 KLUCZ: V9 używa aktualnej planszy
+                    // ENGINE (ZAWSZE NON-NULL ROOT)
+                    val engine = MoveFinderV10(
+                        root = root,
+                        board = engineBoard,
+                        anchor = Anchor(),
+                        validator = MoveValidator(root),
+                        scoring = Scoring(BonusTiles()),
+                        crossCheck = CrossCheckBuilder.build(engineBoard)
+                    )
+
                     val moves = engine.find(rackMap)
 
-                    println("🔥 MOVES FOUND: ${moves.size}")
+                    println("MOVES = ${moves.size}")
 
                     moves
                 }
             )
         }
     }
-}
-
-fun Array<Array<Char?>>.toBoard(): Board {
-
-    val board = Board()
-
-    for (r in 0 until 15) {
-        for (c in 0 until 15) {
-            val ch = this[r][c]
-            if (ch != null) {
-                board.set(r, c, ch)
-            }
-        }
-    }
-
-    return board
 }
